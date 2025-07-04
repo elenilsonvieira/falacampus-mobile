@@ -4,7 +4,6 @@ import {
   Text,
   View,
   Image,
-  TouchableOpacity,
   ScrollView
 } from 'react-native';
 
@@ -16,9 +15,6 @@ export default function App() {
       {/* Cabeçalho: Logo Fala Campus à esquerda, Login à direita */}
       <View style={styles.header}>
         <Image source={require('../../assets/images/Fala_campus-logo.png')} style={styles.logo} />
-        <TouchableOpacity style={styles.loginButton}>
-          <Text style={styles.loginText}>Login</Text>
-        </TouchableOpacity>
       </View>
 
       {/* Texto introdutório em fundo claro */}
@@ -48,6 +44,9 @@ export default function App() {
           <Text style={styles.devsTitle}>Desenvolvedores:</Text>
           <Text style={styles.devsText}>• Marcelo Felipe da Silva</Text>
           <Text style={styles.devsText}>• Lívia Freitas de Lucena</Text>
+          <Text style={styles.devsText}>• Everaldo Daniel de Sousa Filho</Text>
+          <Text style={styles.devsText}>• Guilherme Moraes de Lira</Text>
+          <Text style={styles.devsText}>• Jefferson Almir Ramos da Silva</Text>
         </View>
       </View>
     </ScrollView>
@@ -80,17 +79,6 @@ const styles = StyleSheet.create({
   logo: {
     width: 120,
     height: 40,
-  },
-  loginButton: {
-    backgroundColor: '#8bc34a', // Verde menta
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 5,
-  },
-  loginText: {
-    fontSize: 16,
-    color: '#fff', // Texto branco
-    fontWeight: 'bold',
   },
 
   /* Área de introdução (fundo claro) */

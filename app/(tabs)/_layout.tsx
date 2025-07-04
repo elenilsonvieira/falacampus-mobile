@@ -37,42 +37,42 @@ export default function TabLayout() {
         name="feedback"
         options={{
           title: 'Comentários',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="bubble.left.and.bubble.right.fill" color={color} />,
         }}
       />
       <Tabs.Screen
         name="explore"
         options={{
           title: 'Meus Comentários',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="heart.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.crop.circle.fill" color={color} />,
         }}
       />
        <Tabs.Screen
         name="respostas"
         options={{
           title: 'Respostas',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="book.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="arrowshape.turn.up.left.fill" color={color} />,
         }}
       />
       <Tabs.Screen
         name="criarDep"
         options={{
           title: 'Criar Departamento',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="heart.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="plus.rectangle.fill.on.rectangle.fill" color={color} />,
         }}
       />
       <Tabs.Screen
         name="deps"
         options={{
           title: 'Departamentos',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="heart.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="building.fill" color={color} />,
         }}
       />
        <Tabs.Screen
         name="login"
         options={{
           title: 'Login',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="heart.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="arrow.right.square.fill" color={color} />,
         }}
       />
     </Tabs>
