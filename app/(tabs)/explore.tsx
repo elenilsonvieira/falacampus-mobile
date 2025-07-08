@@ -57,7 +57,7 @@ const SearchComments = () => {
   return (
     <Provider>
       <View style={styles.outerContainer}>
-        <Image source={require('../../assets/images/Fala_campus-logo.png')} style={styles.logo} />
+        <Image source={require('../../assets/images/Fala_campus-logo.png')} style={styles.logo}  />
         <View style={styles.container}>
           <View style={styles.card}>
             <Text style={styles.title}>Buscar Comentários</Text>

@@ -1,35 +1,51 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Alert, FlatList, Modal, RefreshControl, TextInput, } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AntDesign, Feather } from '@expo/vector-icons';
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Alert,
+  FlatList,
+  RefreshControl,
 
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router, useFocusEffect } from "expo-router";
+import ModalDelete from "@/components/modals/ModalDelete";
+import Department from "@/components/departament/Department";
+import { IDepartment } from "@/interface/IDepartment";
+import ModalEditDepartment from "@/components/modals/ModalEditDepartment";
+import CreateDepButton from "@/components/button/CreateDepButton";
 
 const Departamentos = () => {
-  const [departments, setDepartments] = useState([]);
-  const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [departments, setDepartments] = useState<IDepartment[]>([]);
+  const [selectedDepartment, setSelectedDepartment] =useState<IDepartment | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const [editName, setEditName] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [editName, setEditName] = useState("");
 
   // Carrega os departamentos salvos
   const loadDepartments = async () => {
     try {
       const keys = await AsyncStorage.getAllKeys();
-      const departmentKeys = keys.filter((key) => key.startsWith('department_'));
+      const departmentKeys = keys.filter((key) =>
+        key.startsWith("department_")
+      );
       const departmentsData = await AsyncStorage.multiGet(departmentKeys);
-      const departmentsList = departmentsData.map(([key, value]) => JSON.parse(value));
+      const departmentsList = departmentsData.map(([key, value]) =>
+        JSON.parse(value!)
+      );
+
       setDepartments(departmentsList);
     } catch (error) {
       console.log(error);
-      Alert.alert('Erro', 'Ocorreu um erro ao carregar os departamentos.');
+      Alert.alert("Erro", "Ocorreu um erro ao carregar os departamentos.");
     }
   };
 
   // Abre o modal de confirmação para deletar
-  const handleDeleteConfirmation = (department) => {
+  const handleDeleteConfirmation = (department: IDepartment) => {
     setSelectedDepartment(department);
     setModalVisible(true);
   };
@@ -42,15 +58,15 @@ const Departamentos = () => {
       await AsyncStorage.removeItem(`department_${selectedDepartment.id}`);
       setModalVisible(false);
       loadDepartments();
-      Alert.alert('Sucesso', 'Departamento deletado com sucesso!');
+      Alert.alert("Sucesso", "Departamento deletado com sucesso!");
     } catch (error) {
       console.log(error);
-      Alert.alert('Erro', 'Ocorreu um erro ao deletar o departamento.');
+      Alert.alert("Erro", "Ocorreu um erro ao deletar o departamento.");
     }
   };
 
   // Abre o modal de edição
-  const handleEdit = (department) => {
+  const handleEdit = (department: IDepartment) => {
     setSelectedDepartment(department);
     setEditName(department.nome);
     setEditModalVisible(true);
@@ -59,7 +75,7 @@ const Departamentos = () => {
   // Salva as edições do departamento
   const handleSaveEdit = async () => {
     if (!selectedDepartment || !editName.trim()) {
-      Alert.alert('Aviso', 'Por favor, preencha o nome do departamento.');
+      Alert.alert("Aviso", "Por favor, preencha o nome do departamento.");
       return;
     }
 
@@ -75,29 +91,29 @@ const Departamentos = () => {
       );
       setEditModalVisible(false);
       loadDepartments();
-      Alert.alert('Sucesso', 'Departamento editado com sucesso!');
+      Alert.alert("Sucesso", "Departamento editado com sucesso!");
     } catch (error) {
       console.log(error);
-      Alert.alert('Erro', 'Ocorreu um erro ao editar o departamento.');
+      Alert.alert("Erro", "Ocorreu um erro ao editar o departamento.");
     }
   };
 
-  // Função para ativar o modo de edição e desativar o modo de exclusão
-  const activateEditMode = () => {
-    setIsEditing(true); 
-    setIsDeleting(false);
-  };
+ 
 
-  // Função para ativar o modo de exclusão e desativar o modo de edição
-  const activateDeleteMode = () => {
-    setIsDeleting(true);
-    setIsEditing(false);
-  };
+  const handleNavigationCriarDep = () =>{
+    router.push("/screens/criarDep")
+  }
 
   // Carrega os departamentos ao abrir a página
-  useEffect(() => {
-    loadDepartments();
-  }, []);
+  // useEffect(() => {
+  //   loadDepartments();
+  // }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadDepartments();
+    }, [])
+  );
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -106,26 +122,18 @@ const Departamentos = () => {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../../assets/images/Fala_campus-logo.png')} style={styles.logo} />
+      <Image
+        source={require("../../assets/images/Fala_campus-logo.png")}
+        style={styles.logo}
+      />
+      <View style={styles.buttonContainer}>
+        <CreateDepButton
+          handleNavigation={()=>handleNavigationCriarDep()}
+        />
+      </View>
       <Text style={styles.title}>Departamentos</Text>
 
-      {/* Ícones de Editar e Excluir */}
-      <View style={styles.iconsContainer}>
-        <TouchableOpacity 
-          style={styles.iconButton} 
-          onPress={activateEditMode}
-        >
-          <AntDesign name="edit" size={24} color="#6cb43f" />
-          <Text style={styles.iconText}>Editar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.iconButton} 
-          onPress={activateDeleteMode}
-        >
-          <Feather name="trash-2" size={24} color="#ff4444" />
-          <Text style={styles.iconText}>Excluir</Text>
-        </TouchableOpacity>
-      </View>
+
       {/* Lista de departamentos */}
       <FlatList
         data={departments}
@@ -134,82 +142,36 @@ const Departamentos = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.departmentItem}
-            onPress={() => {
-              if (isEditing) handleEdit(item);
-              if (isDeleting) handleDeleteConfirmation(item);
-            }}
-          >
-            <Text style={styles.departmentName}>{item.nome}</Text>
-            {(isEditing || isDeleting) && (
-              <Text style={styles.modeText}>
-                {isEditing ? 'Toque para editar' : 'Toque para excluir'}
-              </Text>
-            )}
-          </TouchableOpacity>
+          <Department
+            nome={item.nome}
+            handleEdit={() => handleEdit(item)}
+            handleDeleteConfirmation={() => handleDeleteConfirmation(item)}
+          />
+          
         )}
       />
 
       {/* Modal de Exlusão */}
-      <Modal
-        visible={modalVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalText}>
-              Tem certeza que deseja deletar o departamento "{selectedDepartment?.nome}"?
-            </Text>
-            <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.modalButton} onPress={handleDelete}>
-                <Text style={styles.buttonText}>Sim</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setModalVisible(false)}
-              >
-                <Text style={styles.buttonText}>Cancelar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      <ModalDelete
+        modalVisible={modalVisible}
+        setModalVisible={() => setModalVisible(false)}
+        handleDelete={handleDelete}
+        modalText={`Tem certeza que deseja deletar o departamento "${selectedDepartment?.nome}"?`}
 
-      {/* Modal de edição */}
-      <Modal
-        visible={editModalVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setEditModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalText}>Editar Departamento</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Nome do Departamento"
-              value={editName}
-              onChangeText={setEditName}
-            />
-            <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.modalButton} onPress={handleSaveEdit}>
-                <Text style={styles.buttonText}>Salvar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setEditModalVisible(false)}
-              >
-                <Text style={styles.buttonText}>Cancelar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      />
 
-      <Text style={styles.footer}>Projeto Fala Campus Mobile - IFPB - Guarabira 2025</Text>
+      {/* Modal de edição */}  
+      <ModalEditDepartment
+        editModalVisible={editModalVisible}
+        editName={editName}
+        setEditName={setEditName}
+        setEditModalVisible={()=> setEditModalVisible(false)}
+        handleSaveEdit={handleSaveEdit}
+      />
+
+      <Text style={styles.footer}>
+        Projeto Fala Campus Mobile - IFPB - Guarabira 2025
+      </Text>
     </View>
   );
 };
@@ -217,97 +179,43 @@ const Departamentos = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff',
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#fff",
     padding: 20,
+  },
+   buttonContainer: {
+    marginVertical: 10, 
   },
   logo: {
     width: 150,
     height: 50,
-    resizeMode: 'contain',
+    resizeMode: "contain",
     marginBottom: 20,
   },
   title: {
     fontSize: 22,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
-  departmentItem: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    width: '100%',
-  },
-  departmentName: {
-    fontSize: 16,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
-  },
-  modalText: {
-    fontSize: 16,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  modalButton: {
-    backgroundColor: '#6cb43f',
-    padding: 10,
-    borderRadius: 5,
-    width: '40%',
-    alignItems: 'center',
-  },
-  cancelButton: {
-    backgroundColor: '#82368c',
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
+
   footer: {
     marginTop: 20,
     fontSize: 12,
-    color: '#666',
-  },
-  iconsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '95%',
-    padding: 10,
-    marginBottom: 0,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 20,
+    color: "#666",
   },
   modeText: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
     marginTop: 5,
   },
   iconButton: {
-    alignItems: 'center', // Centraliza o ícone e o texto horizontalmente
+    alignItems: "center", // Centraliza o ícone e o texto horizontalmente
   },
   iconText: {
     marginTop: 5, // Espaço entre o ícone e o texto
     fontSize: 14,
-    color: '#333',
+    color: "#333",
   },
 });
 

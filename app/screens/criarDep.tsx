@@ -1,47 +1,65 @@
-import { useNavigation } from 'expo-router';
-import React, { useState} from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router, useNavigation } from "expo-router";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Alert,
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { IDepartment } from "@/interface/IDepartment";
+
 
 
 const CadastroDepartamento = () => {
-  const navigation = useNavigation();
+
   const [nome, setNome] = useState("");
 
   const handleSave = async () => {
     if (!nome.trim()) {
-      Alert.alert('Aviso', 'Por favor, preencha o nome do departamento.');
+      Alert.alert("Aviso", "Por favor, preencha o nome do departamento.");
       return;
     }
-  
-    const newDepartment = {
+
+    const newDepartment:IDepartment = {
       id: Date.now().toString(),
       nome: nome.trim(),
     };
-  
+
     try {
-      await AsyncStorage.setItem(`department_${newDepartment.id}`, JSON.stringify(newDepartment));
-      Alert.alert('Sucesso', 'Departamento cadastrado com sucesso!');
-      setNome('');
+      await AsyncStorage.setItem(
+        `department_${newDepartment.id}`,
+        JSON.stringify(newDepartment)
+      );
+      Alert.alert("Sucesso", "Departamento cadastrado com sucesso!");
+      setNome("");
+      router.replace('/(tabs)/deps')
     } catch (error) {
       console.log(error);
-      Alert.alert('Erro', 'Ocorreu um erro ao salvar o departamento.');
+      Alert.alert("Erro", "Ocorreu um erro ao salvar o departamento.");
     }
   };
 
   const handleCancel = () => {
-    navigation.goBack();
+    router.replace('/(tabs)/deps')
   };
 
   return (
     <View style={styles.container}>
-                <Image source={require('../../assets/images/Fala_campus-logo.png')} style={styles.logo} />
-<Text style={styles.title}>Cadastro de Departamento</Text>
+      <Image
+        source={require("../../assets/images/Fala_campus-logo.png")}
+        style={styles.logo}
+      />
+      <Text style={styles.title}>Cadastro de Departamento</Text>
       <Text style={styles.label}>* O campo é obrigatório.</Text>
       <Text style={styles.label}>Nome: *</Text>
       <TextInput
         style={styles.input}
         placeholder="Digite o Nome do Departamento"
+        maxLength={50}
         value={nome}
         onChangeText={setNome}
       />
@@ -53,7 +71,10 @@ const CadastroDepartamento = () => {
           <Text style={styles.buttonText}>Cancelar</Text>
         </TouchableOpacity>
       </View>
-      <Text style={styles.footer}>Projeto Fala Campus Mobile - IFPB - Guarabira 2025</Text>
+      <Text style={styles.footer}>
+        Projeto Fala Campus Mobile - IFPB - Guarabira 2025
+      </Text>
+      
     </View>
   );
 };
@@ -80,6 +101,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     alignSelf: "flex-start",
+    fontWeight: "bold",
   },
   input: {
     width: "100%",
@@ -95,13 +117,17 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     backgroundColor: "#6cb43f",
+    width: 75,
     padding: 10,
     borderRadius: 5,
+    alignItems: "center",
   },
   cancelButton: {
     backgroundColor: "#82368c",
+    width: 75,
     padding: 10,
     borderRadius: 5,
+    alignItems: "center",
   },
   buttonText: {
     color: "#fff",
