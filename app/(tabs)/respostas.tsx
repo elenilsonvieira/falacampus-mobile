@@ -65,10 +65,6 @@ export default function App() {
       <View style={styles.header}>
 
        <Image source={require('../../assets/images/Fala_campus-logo.png')} style={styles.logo} />
-
-        <TouchableOpacity style={styles.loginButton}>
-          <Text style={styles.loginText}>Login</Text>
-        </TouchableOpacity>
       </View>
 
       {/* Card para segurar todo o conteúdo central */}
@@ -145,17 +141,6 @@ const styles = StyleSheet.create({
     width: width * 0.3,
     height: height * 0.05,
     resizeMode: 'contain',
-  },
-  loginButton: {
-    backgroundColor: '#8bc34a',
-    paddingHorizontal: width * 0.03,
-    paddingVertical: height * 0.01,
-    borderRadius: 5,
-  },
-  loginText: {
-    fontSize: 16,
-    color: '#fff',
-    fontWeight: 'bold',
   },
   card: {
     backgroundColor: '#fff',

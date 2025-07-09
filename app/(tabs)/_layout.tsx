@@ -30,56 +30,56 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="home.fill" color={color} />,
         }}
       />
       <Tabs.Screen
         name="feedback"
         options={{
           title: 'Comentários',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="send.fill" color={color} />,
         }}
       />
       <Tabs.Screen
         name="explore"
         options={{
           title: 'Meus Comentários',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="heart.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="mycomments.fill" color={color} />,
         }}
       />
        <Tabs.Screen
         name="respostas"
         options={{
           title: 'Respostas',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="book.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="reply.bubble.fill" color={color} />,
         }}
       />
       <Tabs.Screen
         name="criarDep"
         options={{
           title: 'Criar Departamento',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="heart.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="plus.rectangle.fill.on.rectangle.fill" color={color} />,
         }}
       />
       <Tabs.Screen
         name="deps"
         options={{
           title: 'Departamentos',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="heart.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="apartment.building.fill" color={color} />,
         }}
       />
        <Tabs.Screen
         name="login"
         options={{
           title: 'Login',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="heart.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="login.square.fill" color={color} />,
         }}
       />
       <Tabs.Screen
         name="user"
         options={{
           title: 'Perfil',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="profile.fill" color={color} />,
         }}
       />
     </Tabs>
