@@ -21,6 +21,13 @@ const SearchComments = () => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [comments, setComments] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [editedTitle, setEditedTitle] = useState('');
+  const [commentToEdit, setCommentToEdit] = useState(null);
+  const [editedMessage, setEditedMessage] = useState('');
+  const [editResponseModalVisible, setEditResponseModalVisible] = useState(false);
+  const [responseToEdit, setResponseToEdit] = useState('');
+  const [commentWithResponse, setCommentWithResponse] = useState(null);
 
   // Carrega os comentários do AsyncStorage
   const loadComments = async () => {
@@ -53,6 +60,72 @@ const SearchComments = () => {
   useEffect(() => {
     loadComments();
   }, []);
+  
+  const handleDeleteComment = async (id) => {
+    const updatedComments = comments.filter(comment => comment.id !== id);
+    setComments(updatedComments);
+    await AsyncStorage.setItem('comments', JSON.stringify(updatedComments));
+  };
+
+  const handleEditComment = (id) => {  
+    const comment = comments.find(c => c.id === id);
+    if (comment) {
+      setCommentToEdit(comment);
+      setEditedMessage(comment.message);
+      setEditedTitle(comment.title);
+      setEditModalVisible(true);
+    }
+  };
+
+  const saveEditedComment = async () => {
+    if (!editedMessage.trim()) {
+      Alert.alert('Erro', 'A mensagem não pode estar vazia.');
+      return;
+    }
+
+    const updatedComments = comments.map(comment =>
+      comment.id === commentToEdit.id
+        ? { ...comment, message: editedMessage, title: editedTitle }
+        : comment
+    );
+
+    setComments(updatedComments);
+    await AsyncStorage.setItem('comments', JSON.stringify(updatedComments));
+    setEditModalVisible(false);
+    setCommentToEdit(null);
+  };
+
+  const handleEditResponse = (id) => {
+    const comment = comments.find(c => c.id === id);
+    if (comment && comment.response) {
+      setResponseToEdit(comment.response);
+      setCommentWithResponse(comment);
+      setEditResponseModalVisible(true);
+    }
+  };
+
+  const handleDeleteResponse = async (id) => {
+    const updatedComments = comments.map(comment =>
+      comment.id === id ? { ...comment, response: '' } : comment
+    );
+    setComments(updatedComments);
+    await AsyncStorage.setItem('comments', JSON.stringify(updatedComments));
+  };
+
+  const saveEditedResponse = async () => {
+    const updatedComments = comments.map(comment =>
+      comment.id === commentWithResponse.id
+        ? { ...comment, response: responseToEdit }
+        : comment
+    );
+
+    setComments(updatedComments);
+    await AsyncStorage.setItem('comments', JSON.stringify(updatedComments));
+    setEditResponseModalVisible(false);
+    setCommentWithResponse(null);
+  };
+
+
 
   return (
     <Provider>
@@ -99,7 +172,71 @@ const SearchComments = () => {
           </View>
         </View>
 
+        {editResponseModalVisible && (
+            <View style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalTitle}>Editar Resposta da Administração</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={responseToEdit}
+                    onChangeText={setResponseToEdit}
+                    multiline
+                  />
+                  <View style={{ flexDirection: 'row', marginTop: 10 }}>
+                    <TouchableOpacity
+                      style={[styles.actionButton, { backgroundColor: 'green' }]}
+                      onPress={saveEditedResponse}
+                    >
+                      <Text style={styles.actionText}>Salvar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.actionButton, { backgroundColor: 'gray' }]}
+                      onPress={() => setEditResponseModalVisible(false)}
+                    >
+                      <Text style={styles.actionText}>Cancelar</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+          )}
+
+          {editModalVisible && (
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                <Text style={styles.label}>Editar Título</Text>
+                <TextInput
+                  style={styles.input}
+                  value={editedTitle}
+                  onChangeText={setEditedTitle}
+                />
+                <Text style={styles.modalTitle}>Editar Comentário</Text>
+                <TextInput
+                  style={styles.input}
+                  value={editedMessage}
+                  onChangeText={setEditedMessage}
+                  multiline
+                />
+                <View style={{ flexDirection: 'row', marginTop: 10 }}>
+                  <TouchableOpacity
+                    style={[styles.actionButton, { backgroundColor: 'green' }]}
+                    onPress={saveEditedComment}
+                  >
+                    <Text style={styles.actionText}>Salvar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.actionButton, { backgroundColor: 'gray' }]}
+                    onPress={() => setEditModalVisible(false)}
+                  >
+                    <Text style={styles.actionText}>Cancelar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
+
+
         <View style={styles.responseCard}>
+
           <Text style={styles.responseTitle}>Comentários Enviados</Text>
           <FlatList
             data={comments}
@@ -119,8 +256,38 @@ const SearchComments = () => {
                   <View style={styles.responseContainer}>
                     <Text style={styles.responseLabel}>Resposta da Administração:</Text>
                     <Text style={styles.responseText}>{item.response}</Text>
+                    <View style={styles.buttonContainer}>
+                      <TouchableOpacity
+                        style={[styles.buttonResponse, { backgroundColor: '#4CAF50' }]}
+                        onPress={() => handleEditResponse(item.id)}
+                      >
+                        <Text style={styles.actionText}>Editar</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[styles.buttonResponse, { backgroundColor: '#F44336' }]}
+                        onPress={() => handleDeleteResponse(item.id)}
+                      >
+                        <Text style={styles.actionText}>Remover</Text>
+                      </TouchableOpacity>
+                    </View>
+
+
                   </View>
                 )}
+                <View style={{ flexDirection: 'row', marginTop: 10 }}>
+                  <TouchableOpacity
+                    style={[styles.actionButton, { backgroundColor: '#4CAF50' }]}
+                    onPress={() => handleEditComment(item.id)}
+                  >
+                    <Text style={styles.actionText}>Editar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.actionButton, { backgroundColor: '#F44336' }]}
+                    onPress={() => handleDeleteComment(item.id)}
+                  >
+                    <Text style={styles.actionText}>Remover</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             )}
           />
@@ -131,6 +298,35 @@ const SearchComments = () => {
 };
 
 const styles = StyleSheet.create({
+  modalOverlay: {
+    position: 'absolute',
+    top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    width: '90%',
+    maxWidth: 400,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  actionButton: {
+    padding: 5,
+    borderRadius: 5,
+    marginRight: 10,
+  },
+  actionText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
   outerContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -264,6 +460,16 @@ const styles = StyleSheet.create({
     color: '#333',
     marginTop: 5,
   },
+  buttonResponse: {
+    padding: 3  ,
+    borderRadius: 5,
+    marginRight: 10,
+  },
+  buttonContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: 20,
+  }
 });
 
 export default SearchComments;
