@@ -55,6 +55,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="responder-mensagem"
+        options={{
+          title: 'Responder Mensagem',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="plus.rectangle.fill.on.rectangle.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="criarDep"
         options={{
           title: 'Criar Departamento',
