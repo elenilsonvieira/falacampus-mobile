@@ -11,6 +11,18 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IComment } from "@/interface/IComment";
+import * as Yup from "yup";
+import { Formik } from "formik";
+
+
+
+const validationSchema = Yup.object().shape({
+  resposta: Yup.string()
+    .trim()
+    .min(1, "O campo não pode ser vazio ou só espaços")
+    .max(500)
+    .required("O campo de resposta é obrigatório."),
+});
 
 export default function ResponderMensagem() {
   const { commentId } = useLocalSearchParams<{ commentId: string }>();
@@ -40,11 +52,7 @@ export default function ResponderMensagem() {
     fetchComment();
   }, []);
 
-  const handleSend = async () => {
-    if (!resposta.trim()) {
-      Alert.alert("Aviso", "Por favor, digite uma resposta.");
-      return;
-    }
+  const handleSend = async (values:{resposta:string}) => {
 
     try {
       const stored = await AsyncStorage.getItem("comments");
@@ -52,7 +60,7 @@ export default function ResponderMensagem() {
         let comments: IComment[] = JSON.parse(stored);
         comments = comments.map((c) =>
           c.id === commentId
-            ? { ...c, response: resposta.trim(), status: "Respondido" }
+            ? { ...c, response: values.resposta, status: "Respondido" }
             : c
         );
         await AsyncStorage.setItem("comments", JSON.stringify(comments));
@@ -81,25 +89,46 @@ export default function ResponderMensagem() {
           <Text style={styles.label}>Autor: {comment.author}</Text>
           <Text style={styles.label}>Mensagem:</Text>
           <Text style={styles.messageBox}>{comment.message}</Text>
+          <Formik
+            initialValues={{resposta:""}}
+            validationSchema={validationSchema}
+            onSubmit={(values)=> handleSend(values)}
+          >{({
+            handleChange,
+            handleSubmit,
+            values,
+            errors,
+            touched,
+            handleBlur,}) =>(
+              <>
+                <Text style={styles.label}>Sua Resposta: *</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Digite sua resposta"
+                  maxLength={500}
+                  multiline
+                  value={values.resposta}
+                  onBlur={handleBlur("resposta")}
+                  onChangeText={handleChange("resposta")}
+                />
+                {touched.resposta && errors.resposta && (
+                    <Text style={styles.errorText}>{errors.resposta}</Text>
+                  )}
 
-          <Text style={styles.label}>Sua Resposta: *</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Digite sua resposta"
-            maxLength={500}
-            multiline
-            value={resposta}
-            onChangeText={setResposta}
-          />
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity style={styles.sendButton} onPress={() => handleSubmit()}>
+                    <Text style={styles.buttonText}>Enviar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+                    <Text style={styles.buttonText}>Cancelar</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
 
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-              <Text style={styles.buttonText}>Enviar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
-              <Text style={styles.buttonText}>Cancelar</Text>
-            </TouchableOpacity>
-          </View>
+
+          </Formik>
+         
         </>
       ) : (
         <Text>Carregando mensagem...</Text>
@@ -179,6 +208,11 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+   errorText: {
+    color: "red",
+    alignSelf: "flex-start",
+    marginBottom: 15,
   },
   footer: {
     marginTop: 20,

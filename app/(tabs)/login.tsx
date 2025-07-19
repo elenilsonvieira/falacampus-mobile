@@ -1,9 +1,17 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView } from "react-native";
+import * as Yup from "yup";
+import { Formik } from "formik";
+
+const validationSchema = Yup.object().shape({
+  matricula: Yup.string()
+    .trim()
+    .required("A matrícula é obrigatório")
+    .max(12),
+  senha:Yup.string().required("Digite sua senha")
+});
 
 const LoginScreen = () => {
-  const [matricula, setMatricula] = useState("");
-  const [senha, setSenha] = useState("");
 
   return (
     
@@ -15,30 +23,61 @@ const LoginScreen = () => {
       
     
         <View style={styles.container}>
-     
+        
       
       {/* Formulário de Login */}
-      <View style={styles.formContainer}>
-        <Text style={styles.title}>Login</Text>
-        <Text style={styles.label}>Matrícula: *</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Digite sua matrícula de aluno ou servidor"
-          value={matricula}
-          onChangeText={setMatricula}
-        />
-        <Text style={styles.label}>Senha: *</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Digite sua senha"
-          secureTextEntry
-          value={senha}
-          onChangeText={setSenha}
-        />
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Entrar</Text>
-        </TouchableOpacity>
-      </View>
+      <Formik
+        initialValues={{
+          matricula:"",
+          senha:""}
+        }
+        validationSchema={validationSchema}
+        onSubmit={(values) =>console.log(values)}
+      >
+        {({
+        handleChange,
+        handleSubmit,
+        values,
+        errors,
+        touched,
+        handleBlur,
+        }) => (
+          <>
+            <View style={styles.formContainer}>
+              <Text style={styles.title}>Login</Text>
+              <Text style={styles.label}>Matrícula: *</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Digite sua matrícula de aluno ou servidor"
+                value={values.matricula}
+                onChangeText={handleChange("matricula")}
+                onBlur={handleBlur("matricula")}
+              />
+              {touched.matricula && errors.matricula && (
+                <Text style={{ color: "red" }}>{errors.matricula}</Text>
+              )}
+
+              <Text style={styles.label}>Senha: *</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Digite sua senha"
+                secureTextEntry
+                value={values.senha}
+                onChangeText={handleChange("senha")}
+                onBlur={handleBlur("senha")}
+              />
+              <TouchableOpacity 
+                style={styles.button}
+                onPress={() => handleSubmit()}
+                >
+                <Text style={styles.buttonText}>Entrar</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+
+      </Formik>
+      
    </View>
   
    </ScrollView>

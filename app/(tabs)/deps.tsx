@@ -99,12 +99,13 @@ const Departamentos = () => {
   };
 
  
-
+  // Navegação do botão adicionar
   const handleNavigationCriarDep = () =>{
     router.push("/screens/criarDep")
   }
 
   // Carrega os departamentos ao abrir a página
+
   // useEffect(() => {
   //   loadDepartments();
   // }, []);
