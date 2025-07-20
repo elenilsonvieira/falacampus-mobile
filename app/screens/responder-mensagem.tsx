@@ -27,7 +27,6 @@ const validationSchema = Yup.object().shape({
 export default function ResponderMensagem() {
   const { commentId } = useLocalSearchParams<{ commentId: string }>();
   const [comment, setComment] = useState<IComment | null>(null);
-  const [resposta, setResposta] = useState("");
 
   useEffect(() => {
     const fetchComment = async () => {

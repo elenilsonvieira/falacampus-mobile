@@ -106,15 +106,15 @@ const Departamentos = () => {
 
   // Carrega os departamentos ao abrir a página
 
-  // useEffect(() => {
-  //   loadDepartments();
-  // }, []);
+  useEffect(() => {
+    loadDepartments();
+  }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      loadDepartments();
-    }, [])
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     loadDepartments();
+  //   }, [])
+  // );
 
   const onRefresh = () => {
     setRefreshing(true);

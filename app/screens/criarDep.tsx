@@ -21,7 +21,7 @@ const validationSchema = Yup.object().shape({
     .trim()
     .min(1, "O campo não pode ser vazio ou só espaços")
     .max(30)
-    .required("O nome do departamento é obrigatório"),
+    .required("O nome do departamento é obrigatório."),
 });
 
 const CadastroDepartamento = () => {

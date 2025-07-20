@@ -14,22 +14,22 @@ const validationSchema = Yup.object().shape({
         .trim()
         .max(30) 
         .min(1, "O título não pode ser vazio ou só espaços")
-        .required("O título é obrigatório"),
+        .required("O título é obrigatório."),
     message: Yup.string()
         .trim()
         .min(1, "A mensagem não pode ser vazia ou só espaços")
-        .required("A mensagem é obrigatória").max(255),
+        .required("A mensagem é obrigatória.").max(255),
     department:Yup.string()
         .trim()
         .min(1, "O departamento não pode ser vazio ou só espaços")
-        .required("O Departamento é obrigatório").max(30),
+        .required("O Departamento é obrigatório.").max(30),
     commentType:Yup.string()
         .oneOf(["Crítica", "Elogio", "Sugestão"],"Selecione um tipo válido")
-        .required("O tipo de comentário é obrigatório"),
+        .required("O tipo de comentário é obrigatório."),
     author:Yup.string()
         .trim()
         .min(1, "O nome do autor não pode ser vazio ou só espaços")
-        .required("O nome do autor é obrigatório").max(50),
+        .required("O nome do autor é obrigatório.").max(50),
 
 });
 
@@ -70,7 +70,9 @@ const CommentRegistration = () => {
     };
 
     return (
+        
         <Provider>
+            
             <View style={styles.container}>
                 <Image source={require('../../assets/images/Fala_campus-logo.png')} style={styles.logo} />
 

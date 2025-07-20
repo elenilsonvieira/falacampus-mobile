@@ -6,9 +6,9 @@ import { Formik } from "formik";
 const validationSchema = Yup.object().shape({
   matricula: Yup.string()
     .trim()
-    .required("A matrícula é obrigatório")
+    .required("A matrícula é obrigatória.")
     .max(12),
-  senha:Yup.string().required("Digite sua senha")
+  senha:Yup.string().required("Digite sua senha.")
 });
 
 const LoginScreen = () => {
@@ -66,6 +66,9 @@ const LoginScreen = () => {
                 onChangeText={handleChange("senha")}
                 onBlur={handleBlur("senha")}
               />
+              {touched.matricula && errors.senha && (
+                <Text style={{ color: "red" }}>{errors.senha}</Text>
+              )}
               <TouchableOpacity 
                 style={styles.button}
                 onPress={() => handleSubmit()}
