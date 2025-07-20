@@ -148,14 +148,14 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     backgroundColor: "#6cb43f",
-    width: 75,
+    width: 100,
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
   },
   cancelButton: {
     backgroundColor: "#82368c",
-    width: 75,
+    width: 100,
     padding: 10,
     borderRadius: 5,
     alignItems: "center",

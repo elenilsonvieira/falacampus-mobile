@@ -57,7 +57,8 @@ const styles = StyleSheet.create({
   iconButton: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 10,
+    marginLeft: 25,
+    
   },
   card: {
     padding: 15,

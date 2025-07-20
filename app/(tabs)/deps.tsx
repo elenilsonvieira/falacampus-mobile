@@ -136,7 +136,10 @@ const Departamentos = () => {
 
 
       {/* Lista de departamentos */}
+      
+
       <FlatList
+        
         data={departments}
         keyExtractor={(item) => item.id}
         refreshControl={
@@ -151,6 +154,7 @@ const Departamentos = () => {
           
         )}
       />
+      
 
       {/* Modal de Exlusão */}
       <ModalDelete
