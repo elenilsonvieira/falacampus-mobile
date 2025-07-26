@@ -1,5 +1,7 @@
 import { Modal, StyleSheet, TouchableOpacity } from "react-native";
 import { Text, TextInput, View } from "react-native";
+import * as Yup from "yup";
+import { Formik } from "formik";
 
 export type ModalDepartmentProps ={
     editModalVisible:boolean;
@@ -9,6 +11,13 @@ export type ModalDepartmentProps ={
     handleSaveEdit: () => void;
 
 };
+const validationSchema = Yup.object().shape({
+  nome: Yup.string()
+    .trim()
+    .min(5, "O campo tem que ter no mínimo 5 caracteres")
+    .max(30)
+    .required("O nome do departamento é obrigatório."),
+});
 
 export default function ModalEditDepartment({editModalVisible,setEditModalVisible,editName,setEditName,handleSaveEdit }:ModalDepartmentProps){
 
@@ -22,26 +31,51 @@ export default function ModalEditDepartment({editModalVisible,setEditModalVisibl
             <View style={styles.modalContainer}>
                 <View style={styles.modalContent}>
                     <Text style={styles.modalText}>Editar Departamento</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Nome do Departamento"
-                        value={editName}
-                        onChangeText={setEditName}
-                    />
-                    <View style={styles.modalButtons}>
-                        <TouchableOpacity
-                        style={styles.modalButton}
-                        onPress={handleSaveEdit}
-                        >
-                        <Text style={styles.buttonText}>Salvar</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                        style={[styles.modalButton, styles.cancelButton]}
-                        onPress={() => setEditModalVisible(false)}
-                        >
-                        <Text style={styles.buttonText}>Cancelar</Text>
-                        </TouchableOpacity>
-                    </View>
+                    <Formik
+                      initialValues={{nome:editName}}
+                      validationSchema={validationSchema}
+                      onSubmit={()=> handleSaveEdit()}
+                    >
+                      {({
+                        handleChange,
+                        handleSubmit,
+                        values,
+                        errors,
+                        touched,
+                        handleBlur, 
+                      })=>(
+                        <>
+                          <TextInput
+                            style={styles.input}
+                            placeholder="Nome do Departamento"
+                            value={values.nome}
+                            onChangeText={(text) => {
+                              handleChange("nome")(text);
+                              setEditName(text);
+                            }}
+                            onBlur={handleBlur("nome")}
+                          />
+                          {touched.nome && errors.nome && (
+                            <Text style={{ color: "red", marginBottom: 20 }}>{errors.nome}</Text>
+                          )}
+                          <View style={styles.modalButtons}>
+                              <TouchableOpacity
+                              style={styles.modalButton}
+                              onPress={() => handleSubmit()}
+                              >
+                              <Text style={styles.buttonText}>Salvar</Text>
+                              </TouchableOpacity>
+                              <TouchableOpacity
+                                style={[styles.modalButton, styles.cancelButton]}
+                                onPress={() => setEditModalVisible(false)}
+                              >
+                                <Text style={styles.buttonText}>Cancelar</Text>
+                              </TouchableOpacity>
+                          </View>
+                        </>
+                      )}
+
+                    </Formik>
                 </View>
             </View>
         </Modal>  
@@ -71,14 +105,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
   },
   modalButton: {
-    backgroundColor: "#6cb43f",
+    backgroundColor: '#4CAF50',
     padding: 10,
     borderRadius: 5,
     width: "40%",
     alignItems: "center",
   },
   cancelButton: {
-    backgroundColor: "#82368c",
+    backgroundColor: '#F44336',
   },
   buttonText: {
     color: "#fff",
@@ -89,6 +123,6 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     padding: 10,
     borderRadius: 5,
-    marginBottom: 20,
+    marginBottom: 10,
   },
 });

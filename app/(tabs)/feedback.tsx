@@ -1,41 +1,44 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, Keyboard } from 'react-native';
-import { Provider, Menu, Button } from 'react-native-paper';
-import { AntDesign } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, Keyboard, ScrollView } from 'react-native';
+import { Provider,} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
 import * as Yup from "yup";
 import { Formik } from "formik";
+import DropDownPicker from 'react-native-dropdown-picker';
 
 
 
 const validationSchema = Yup.object().shape({
     title: Yup.string()
         .trim()
-        .max(30) 
-        .min(1, "O título não pode ser vazio ou só espaços")
+        .max(50) 
+        .min(10, "O título tem que ter no mínimo 10 caracteres")
         .required("O título é obrigatório."),
     message: Yup.string()
         .trim()
-        .min(1, "A mensagem não pode ser vazia ou só espaços")
+        .min(10, "A mensagem tem que ter no mínimo 10 caracteres")
         .required("A mensagem é obrigatória.").max(255),
     department:Yup.string()
-        .trim()
-        .min(1, "O departamento não pode ser vazio ou só espaços")
-        .required("O Departamento é obrigatório.").max(30),
+        .required("O Departamento é obrigatório."),
     commentType:Yup.string()
-        .oneOf(["Crítica", "Elogio", "Sugestão"],"Selecione um tipo válido")
         .required("O tipo de comentário é obrigatório."),
     author:Yup.string()
         .trim()
-        .min(1, "O nome do autor não pode ser vazio ou só espaços")
+        .min(10, "O nome tem que ter no mínimo 10 caracteres")
         .required("O nome do autor é obrigatório.").max(50),
 
 });
 
 const CommentRegistration = () => {
-    const navigation = useNavigation();
-    const [menuVisible, setMenuVisible] = useState(false);
+    const [departments, setDepartments] = useState<{ label: string; value: string }[]> ([])
+    const [openDepartment, setOpenDepartment] = useState(false);
+    const [openCommentType, setOpenCommentType] = useState(false);
+    const [commentTypeList, setCommentTypeList] = useState([
+        { label: "Crítica", value: "Crítica" },
+        { label: "Elogio", value: "Elogio" },
+        { label: "Sugestão", value: "Sugestão" }
+    ]);
+
 
     // Data fixa para o dia atual
     const currentDate = new Date().toLocaleDateString('pt-BR');
@@ -63,21 +66,49 @@ const CommentRegistration = () => {
             Alert.alert('Sucesso', 'Comentário cadastrado com sucesso!');
             Keyboard.dismiss();
             resetForm();
-            navigation.navigate('SearchComments'); // Agora a navegação está correta
         } catch (error) {
             console.log(error);
         }
     };
 
+
+    const getDepartments = async () =>{
+       try {
+      const keys = await AsyncStorage.getAllKeys();
+      const departmentKeys = keys.filter((key) => key.startsWith("department_"));
+      const departmentsData = await AsyncStorage.multiGet(departmentKeys);
+      const departmentsList = departmentsData.map(([key, value]) => JSON.parse(value!));
+
+      // Monta o formato necessário para o DropDownPicker
+      const formattedList = departmentsList.map((item) => ({
+        label: item.nome, 
+        value: item.id || item.nome, 
+      }));
+
+      setDepartments(formattedList);
+    } catch (error) {
+      console.log(error);
+    }
+    }
+    
+    useEffect(()=>{
+        getDepartments()
+    },[])
     return (
         
         <Provider>
-            
-            <View style={styles.container}>
+            <View style={styles.containerLogo}>
+
                 <Image source={require('../../assets/images/Fala_campus-logo.png')} style={styles.logo} />
+            </View>
+            <ScrollView>
+
+            <View style={styles.container}>
 
                 <View style={styles.card}>
+                    
                     <Text style={styles.title}>Cadastro de Comentário</Text>
+                        
                     <Formik
                         initialValues={{
                             title: "",
@@ -94,11 +125,39 @@ const CommentRegistration = () => {
                             handleBlur,
                             handleSubmit,
                             setFieldValue,
+                            setFieldTouched,
                             values,
                             errors,
                             touched,
+                            resetForm,
                         }) => (
                             <>
+
+                            <View >
+
+                                <Text style={styles.label}>Departamento: *</Text>
+                                <DropDownPicker
+                                    open={openDepartment}
+                                    value={values.department}
+                                    items={departments}
+                                    setOpen={setOpenDepartment} 
+                                    setValue={(callback) => {
+                                        const newValue = callback(values.department);
+                                        setFieldValue("department", newValue);    
+                                    }}
+                                    setItems={setDepartments}
+                                    placeholder="Selecione um departamento"
+                                    onClose={() => setFieldTouched("department", false)}  
+                                    style={[styles.input]}
+                                    dropDownContainerStyle={{ borderColor: "#ccc"}}
+                                    listMode="SCROLLVIEW"
+                                    
+                                />
+                                {touched.department && errors.department && (
+                                    <Text style={{ color: "red" }}>{errors.department}</Text>
+                                )}
+                            </View>
+
                             <Text style={styles.label}>Título: *</Text>
                             <TextInput
                                 style={styles.input}
@@ -144,51 +203,32 @@ const CommentRegistration = () => {
                                 <Text style={{ color: "red" }}>{errors.author}</Text>
                             )}
 
-                            <Text style={styles.label}>Nome do Departamento: *</Text>
-                            <TextInput
-                                style={styles.input}
-                                value={values.department}
-                                onChangeText={handleChange("department")}
-                                onBlur={handleBlur("department")}
-                                placeholder="Digite nome do departamento"
-                                placeholderTextColor="#333"
-                            />
-                            {touched.department && errors.department && (
-                                <Text style={{ color: "red" }}>{errors.department}</Text>
-                            )}
+                           
 
-                            <Text style={styles.label}>Tipo de Comentário: *</Text>
-                            <View style={styles.dropdownContainer}>
-                                <Menu
-                                    visible={menuVisible}
-                                    onDismiss={() => setMenuVisible(false)}
-                                    anchor={
-                                    <Button
-                                    mode="outlined"
-                                    onPress={() => setMenuVisible(true)}
-                                    style={styles.dropdownButton}
-                                    labelStyle={styles.dropdownButtonText}
-                                    >
-                                    {values.commentType || "Selecionar"}{" "}
-                                    <AntDesign name="down" size={14} color="black" />
-                                    </Button>
-                                }
-                                >
-                                {["Crítica", "Elogio", "Sugestão"].map((item) => (
-                                    <Menu.Item
-                                    key={item}
-                                    onPress={() => {
-                                        setFieldValue("commentType", item);
-                                        setMenuVisible(false);
+                            <View style={{ zIndex: openCommentType ? 3000 : 0 }}>
+
+                                <Text style={styles.label}>Tipo de Comentário: *</Text>
+                                <DropDownPicker
+                                    open={openCommentType}
+                                    value={values.commentType}
+                                    items={commentTypeList}
+                                    setOpen={setOpenCommentType} 
+                                    setValue={(callback) => {
+                                        const newValue = callback(values.commentType);
+                                        setFieldValue("commentType", newValue);    
                                     }}
-                                    title={item}
-                                    />
-                                ))}
-                                </Menu>
+                                    setItems={setCommentTypeList}
+                                    placeholder="Selecione um comentário"
+                                    onClose={() => setFieldTouched("commentType", false)}    
+                                    style={[styles.input]}
+                                    dropDownContainerStyle={{ borderColor: "#ccc" }}
+                                    listMode="SCROLLVIEW"
+                                />
+                                {touched.commentType && errors.commentType && (
+                                    <Text style={{ color: "red" }}>{errors.commentType}</Text>
+                                )}
                             </View>
-                            {touched.commentType && errors.commentType && (
-                                <Text style={{ color: "red" }}>{errors.commentType}</Text>
-                            )}
+
 
                             <View style={styles.buttonContainer}>
                                 <TouchableOpacity style={styles.saveButton} onPress={()=>handleSubmit()}>
@@ -196,18 +236,20 @@ const CommentRegistration = () => {
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                 style={styles.cancelButton}
-                                onPress={() => navigation.goBack()}
+                                onPress={() => resetForm()}
                                 >
-                                <Text style={styles.buttonText}>Cancelar</Text>
+                                <Text style={styles.buttonText}>Limpar</Text>
                                 </TouchableOpacity>
                             </View>
                             </>
                         )}
                     </Formik>
+                    
 
                     
                 </View>
             </View>
+            </ScrollView>
         </Provider>
     );
 };
@@ -219,11 +261,19 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#F5F5F5',
     },
+    containerLogo: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F5F5F5',
+        
+    },
+
     logo: {
         width: 150,
         height: 50,
         resizeMode: 'contain',
         marginBottom: 20,
+
     },
     card: {
         backgroundColor: 'white',
@@ -279,7 +329,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     saveButton: {
-        backgroundColor: 'green',
+        backgroundColor: '#4CAF50',
         padding: 15,
         borderRadius: 5,
         flex: 1,
@@ -287,7 +337,7 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     cancelButton: {
-        backgroundColor: 'purple',
+        backgroundColor: '#F44336',
         padding: 15,
         borderRadius: 5,
         flex: 1,

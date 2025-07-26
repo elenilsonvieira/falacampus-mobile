@@ -139,7 +139,7 @@ const Departamentos = () => {
       
 
       <FlatList
-        
+        style={{width:375}}
         data={departments}
         keyExtractor={(item) => item.id}
         refreshControl={
