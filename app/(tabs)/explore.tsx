@@ -275,12 +275,14 @@ const SearchComments = () => {
                   </View>
                 )}
                 <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                  <TouchableOpacity
-                    style={[styles.actionButton, { backgroundColor: '#4CAF50' }]}
-                    onPress={() => handleEditComment(item.id)}
-                  >
-                    <Text style={styles.actionText}>Editar</Text>
-                  </TouchableOpacity>
+                  {!item.response && (
+                    <TouchableOpacity
+                      style={[styles.actionButton, { backgroundColor: '#4CAF50' }]}
+                      onPress={() => handleEditComment(item.id)}
+                    >
+                      <Text style={styles.actionText}>Editar</Text>
+                    </TouchableOpacity>
+                  )}
                   <TouchableOpacity
                     style={[styles.actionButton, { backgroundColor: '#F44336' }]}
                     onPress={() => handleDeleteComment(item.id)}
