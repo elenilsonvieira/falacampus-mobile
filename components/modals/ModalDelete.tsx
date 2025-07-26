@@ -65,14 +65,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
   },
   modalButton: {
-    backgroundColor: "#6cb43f",
+    backgroundColor: '#4CAF50',
     padding: 10,
     borderRadius: 5,
     width: "40%",
     alignItems: "center",
   },
   cancelButton: {
-    backgroundColor: "#82368c",
+    backgroundColor: '#F44336',
   },
   buttonText: {
     color: "#fff",

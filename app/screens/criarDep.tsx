@@ -19,7 +19,7 @@ import { Formik } from "formik";
 const validationSchema = Yup.object().shape({
   nome: Yup.string()
     .trim()
-    .min(1, "O campo não pode ser vazio ou só espaços")
+    .min(5, "O campo não pode ser vazio ou só espaços")
     .max(30)
     .required("O nome do departamento é obrigatório."),
 });
