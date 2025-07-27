@@ -19,7 +19,7 @@ import { Formik } from "formik";
 const validationSchema = Yup.object().shape({
   nome: Yup.string()
     .trim()
-    .min(5, "O campo não pode ser vazio ou só espaços")
+    .min(5, "O campo tem que ter no mínimo 5 caracteres")
     .max(30)
     .required("O nome do departamento é obrigatório."),
 });
@@ -147,14 +147,14 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   saveButton: {
-    backgroundColor: "#6cb43f",
+    backgroundColor: '#4CAF50',
     width: 100,
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
   },
   cancelButton: {
-    backgroundColor: "#82368c",
+    backgroundColor: '#F44336',
     width: 100,
     padding: 10,
     borderRadius: 5,
