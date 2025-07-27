@@ -10,10 +10,12 @@ import {
   Keyboard,
   FlatList,
   RefreshControl,
+  Dimensions,
 } from 'react-native';
 import { Provider, Menu, Button } from 'react-native-paper';
 import { AntDesign } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+const { width, height } = Dimensions.get('window');
 
 const SearchComments = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -184,16 +186,16 @@ const SearchComments = () => {
                   />
                   <View style={{ flexDirection: 'row', marginTop: 10 }}>
                     <TouchableOpacity
-                      style={[styles.actionButton, { backgroundColor: 'green' }]}
+                      style={[styles.saveButton]}
                       onPress={saveEditedResponse}
                     >
-                      <Text style={styles.actionText}>Salvar</Text>
+                      <Text style={styles.saveText}>Salvar</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      style={[styles.actionButton, { backgroundColor: 'gray' }]}
+                      style={[styles.cancelButton]}
                       onPress={() => setEditResponseModalVisible(false)}
                     >
-                      <Text style={styles.actionText}>Cancelar</Text>
+                      <Text style={styles.cancelText}>Cancelar</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -218,16 +220,16 @@ const SearchComments = () => {
                 />
                 <View style={{ flexDirection: 'row', marginTop: 10 }}>
                   <TouchableOpacity
-                    style={[styles.actionButton, { backgroundColor: 'green' }]}
+                    style={[styles.saveButton]}
                     onPress={saveEditedComment}
                   >
-                    <Text style={styles.actionText}>Salvar</Text>
+                    <Text style={styles.saveText}>Salvar</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[styles.actionButton, { backgroundColor: 'gray' }]}
+                    style={[styles.cancelButton]}
                     onPress={() => setEditModalVisible(false)}
                   >
-                    <Text style={styles.actionText}>Cancelar</Text>
+                    <Text style={styles.cancelText}>Cancelar</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -239,60 +241,65 @@ const SearchComments = () => {
 
           <Text style={styles.responseTitle}>Comentários Enviados</Text>
           <FlatList
-            data={comments}
-            keyExtractor={(item) => item.id}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-            renderItem={({ item }) => (
-              <View style={styles.commentItem}>
+          data={comments}
+          keyExtractor={(item) => item.id}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          renderItem={({ item }) => (
+            <View style={styles.commentItem}>
+              
+              {/* Conteúdo centralizado */}
+              <View style={styles.commentContent}>
                 <Text style={styles.commentTitle}>{item.title}</Text>
                 <Text style={styles.commentText}>{item.message}</Text>
-                <Text style={styles.commentStatus}>Autor: {item.author}</Text>
-                <Text style={styles.commentStatus}>Status: {item.status}</Text>
-
-                {/* Exibe a resposta da administração, se existir */}
-                {item.response && (
-                  <View style={styles.responseContainer}>
-                    <Text style={styles.responseLabel}>Resposta da Administração:</Text>
-                    <Text style={styles.responseText}>{item.response}</Text>
-                    <View style={styles.buttonContainer}>
-                      <TouchableOpacity
-                        style={[styles.buttonResponse, { backgroundColor: '#4CAF50' }]}
-                        onPress={() => handleEditResponse(item.id)}
-                      >
-                        <Text style={styles.actionText}>Editar</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[styles.buttonResponse, { backgroundColor: '#F44336' }]}
-                        onPress={() => handleDeleteResponse(item.id)}
-                      >
-                        <Text style={styles.actionText}>Remover</Text>
-                      </TouchableOpacity>
-                    </View>
-
-
-                  </View>
-                )}
-                <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                  {!item.response && (
-                    <TouchableOpacity
-                      style={[styles.actionButton, { backgroundColor: '#4CAF50' }]}
-                      onPress={() => handleEditComment(item.id)}
-                    >
-                      <Text style={styles.actionText}>Editar</Text>
-                    </TouchableOpacity>
-                  )}
-                  <TouchableOpacity
-                    style={[styles.actionButton, { backgroundColor: '#F44336' }]}
-                    onPress={() => handleDeleteComment(item.id)}
-                  >
-                    <Text style={styles.actionText}>Remover</Text>
-                  </TouchableOpacity>
-                </View>
+                <Text style={styles.commentStatus}><b>Autor</b>: {item.author}</Text>
+                <Text style={styles.commentStatus}><b>Status</b>: {item.status}</Text>
               </View>
-            )}
-          />
+
+              {/* Botões principais */}
+              <View style={styles.cardFooter}>
+                {!item.response && (
+                  <TouchableOpacity
+                    style={[styles.editButton]}
+                    onPress={() => handleEditComment(item.id)}
+                  >
+                    <Text style={styles.editButtonText}>Editar</Text>
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity
+                  style={[styles.deleteButton]}
+                  onPress={() => handleDeleteComment(item.id)}
+                >
+                  <Text style={styles.deleteButtonText}>Remover</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Resposta da administração */}
+              {item.response && (
+                <View style={styles.responseContainer}>
+                  <Text style={styles.responseLabel}>Resposta da Administração:</Text>
+                  <Text style={styles.responseText}>{item.response}</Text>
+                  <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                      style={[styles.editButton]}
+                      onPress={() => handleEditResponse(item.id)}
+                    >
+                      <Text style={styles.editButtonText}>Editar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.deleteButton]}
+                      onPress={() => handleDeleteResponse(item.id)}
+                    >
+                      <Text style={styles.deleteButtonText}>Remover</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+            </View>
+          )}
+        />
+
         </View>
       </View>
     </Provider>
@@ -300,45 +307,12 @@ const SearchComments = () => {
 };
 
 const styles = StyleSheet.create({
-  modalOverlay: {
-    position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 10,
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 10,
-    width: '90%',
-    maxWidth: 400,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  actionButton: {
-    padding: 5,
-    borderRadius: 5,
-    marginRight: 10,
-  },
-  actionText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
   outerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
     padding: 20,
-  },
-  container: {
-    width: '100%',
-    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
   },
   logo: {
     width: 150,
@@ -346,82 +320,86 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     marginBottom: 20,
   },
+  container: {
+    width: '100%',
+    alignItems: 'center',
+  },
   card: {
     backgroundColor: 'white',
-    width: '90%',
-    padding: 20,
     borderRadius: 10,
+    padding: 20,
+    width: '90%',
+    elevation: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-    elevation: 5,
     alignItems: 'center',
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    textAlign: 'center',
     marginBottom: 10,
+    textAlign: 'center',
   },
   label: {
+    alignSelf: 'flex-start',
     fontSize: 14,
     fontWeight: 'bold',
     marginTop: 10,
-    alignSelf: 'flex-start',
   },
   input: {
+    width: '100%',
+    backgroundColor: '#FFF',
     borderWidth: 1,
     borderColor: '#CCC',
-    padding: 10,
     borderRadius: 5,
-    backgroundColor: '#FFF',
+    padding: 10,
     marginTop: 5,
     color: '#333',
-    width: '100%',
   },
   dropdownContainer: {
-    marginTop: 10,
-    alignSelf: 'flex-start',
     width: '100%',
+    alignSelf: 'flex-start',
+    marginTop: 10,
   },
   dropdownButton: {
+    width: '100%',
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#CCC',
     padding: 5,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',
   },
   dropdownButtonText: {
     fontSize: 14,
     color: 'black',
   },
   searchButton: {
-    backgroundColor: 'green',
+    width: '100%',
+    marginTop: 20,
     padding: 15,
     borderRadius: 5,
+    backgroundColor: '#4CAF50',
     alignItems: 'center',
-    marginTop: 20,
-    width: '100%',
   },
   buttonText: {
-    color: 'white',
     fontWeight: 'bold',
+    color: 'white',
   },
   responseCard: {
-    backgroundColor: 'white',
+    flex: 1,
+    marginTop: 20,
     width: '90%',
-    padding: 20,
+    backgroundColor: 'white',
     borderRadius: 10,
+    padding: 20,
+    elevation: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-    elevation: 5,
-    marginTop: 20,
-    flex: 1,
   },
   responseTitle: {
     fontSize: 18,
@@ -430,9 +408,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   commentItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#CCC',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#eabfb3',
+    padding: 16,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  commentContent: {
+    alignItems: 'center',
   },
   commentTitle: {
     fontSize: 16,
@@ -441,16 +429,25 @@ const styles = StyleSheet.create({
   commentText: {
     fontSize: 14,
     color: '#333',
+    textAlign: 'center',
+    marginVertical: 8,
   },
   commentStatus: {
     fontSize: 12,
     color: '#666',
   },
-  responseContainer: {
-    backgroundColor: '#e0f7fa',
-    padding: 10,
-    borderRadius: 5,
+  cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginTop: 10,
+  },
+  responseContainer: {
+    marginTop: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#b2dfdb',
+    borderRadius: 10,
   },
   responseLabel: {
     fontSize: 14,
@@ -460,18 +457,83 @@ const styles = StyleSheet.create({
   responseText: {
     fontSize: 14,
     color: '#333',
-    marginTop: 5,
-  },
-  buttonResponse: {
-    padding: 3  ,
-    borderRadius: 5,
-    marginRight: 10,
+    textAlign: 'center',
+    marginTop: 8,
   },
   buttonContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginTop: 20,
-  }
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+  },
+  editButton: {
+    backgroundColor: '#c8e6c9',
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    borderRadius: 6,
+    marginRight: 10,
+  },
+  editButtonText: {
+    color: '#388e3c',
+    fontWeight: 'bold',
+    fontSize: width * 0.035,
+    },
+  deleteButton: {
+    backgroundColor: '#ffe5e5',
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    borderRadius: 6,
+  },
+  deleteButtonText: {
+    color: '#b71c1c',
+    fontWeight: 'bold',
+    fontSize: width * 0.035,
+  },
+  saveButton:{
+    backgroundColor: '#c8e6c9',
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    borderRadius: 6,
+    marginRight: 10,
+  },
+  saveText:{
+    color: '#388e3c',
+    fontWeight: 'bold',
+    fontSize: width * 0.035
+  },
+  cancelButton:{
+    backgroundColor: '#ffe5e5',
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    borderRadius: 6,
+  },
+  cancelText:{
+    color: '#b71c1c',
+    fontWeight: 'bold',
+    fontSize: width * 0.035,
+  },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '90%',
+    maxWidth: 400,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
 });
 
 export default SearchComments;
