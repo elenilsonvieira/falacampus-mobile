@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, Keyboard, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, Keyboard, ScrollView, TouchableWithoutFeedback } from 'react-native';
 import { Provider,} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Yup from "yup";
 import { Formik } from "formik";
 import DropDownPicker from 'react-native-dropdown-picker';
+
 
 
 
@@ -79,7 +80,7 @@ const CommentRegistration = () => {
       const departmentsData = await AsyncStorage.multiGet(departmentKeys);
       const departmentsList = departmentsData.map(([key, value]) => JSON.parse(value!));
 
-      // Monta o formato necessário para o DropDownPicker
+      //formato necessário para o DropDownPicker
       const formattedList = departmentsList.map((item) => ({
         label: item.nome, 
         value: item.nome, 
@@ -132,32 +133,32 @@ const CommentRegistration = () => {
                             resetForm,
                         }) => (
                             <>
+                           
 
-                            <View >
-
-                                <Text style={styles.label}>Departamento: *</Text>
-                                <DropDownPicker
-                                    open={openDepartment}
-                                    value={values.department}
-                                    items={departments}
-                                    setOpen={setOpenDepartment} 
-                                    setValue={(callback) => {
-                                        const newValue = callback(values.department);
-                                        setFieldValue("department", newValue);    
-                                    }}
-                                    setItems={setDepartments}
-                                    placeholder="Selecione um departamento"
-                                    onClose={() => setFieldTouched("department", false)}  
-                                    style={[styles.input]}
-                                    dropDownContainerStyle={{ borderColor: "#ccc"}}
-                                    listMode="SCROLLVIEW"
+                            <Text style={styles.label}>Departamento: *</Text>
+                            <DropDownPicker
+                            
+                                open={openDepartment}
+                                value={values.department}
+                                items={departments}
+                                setOpen={setOpenDepartment} 
+                                setValue={(callback) => {
+                                    const newValue = callback(values.department);
+                                    setFieldValue("department", newValue);    
+                                }}
+                                setItems={setDepartments}
+                                placeholder="Selecione um departamento"
+                                onClose={() => setFieldTouched("department", false)}  
+                                style={[styles.input]}
+                                dropDownContainerStyle={{ borderColor: "#ccc"}}
+                                listMode="SCROLLVIEW"
                                     
-                                />
-                                {touched.department && errors.department && (
-                                    <Text style={{ color: "red" }}>{errors.department}</Text>
-                                )}
-                            </View>
-
+                            />
+                            {touched.department && errors.department && (
+                                <Text style={{ color: "red" }}>{errors.department}</Text>
+                            )}
+                            
+                            
                             <Text style={styles.label}>Título: *</Text>
                             <TextInput
                                 style={styles.input}
