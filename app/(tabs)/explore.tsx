@@ -10,10 +10,12 @@ import {
   Keyboard,
   FlatList,
   RefreshControl,
+  Dimensions,
 } from 'react-native';
 import { Provider, Menu, Button } from 'react-native-paper';
 import { AntDesign } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+const { width, height } = Dimensions.get('window');
 
 const SearchComments = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -184,16 +186,16 @@ const SearchComments = () => {
                   />
                   <View style={{ flexDirection: 'row', marginTop: 10 }}>
                     <TouchableOpacity
-                      style={[styles.actionButton, { backgroundColor: '#388e3c' }]}
+                      style={[styles.saveButton]}
                       onPress={saveEditedResponse}
                     >
-                      <Text style={styles.actionText}>Salvar</Text>
+                      <Text style={styles.saveText}>Salvar</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      style={[styles.actionButton, { backgroundColor: 'gray' }]}
+                      style={[styles.cancelButton]}
                       onPress={() => setEditResponseModalVisible(false)}
                     >
-                      <Text style={styles.actionText}>Cancelar</Text>
+                      <Text style={styles.cancelText}>Cancelar</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -218,16 +220,16 @@ const SearchComments = () => {
                 />
                 <View style={{ flexDirection: 'row', marginTop: 10 }}>
                   <TouchableOpacity
-                    style={[styles.actionButton, { backgroundColor: '#388e3c' }]}
+                    style={[styles.saveButton]}
                     onPress={saveEditedComment}
                   >
-                    <Text style={styles.actionText}>Salvar</Text>
+                    <Text style={styles.saveText}>Salvar</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[styles.actionButton, { backgroundColor: 'gray' }]}
+                    style={[styles.cancelButton]}
                     onPress={() => setEditModalVisible(false)}
                   >
-                    <Text style={styles.actionText}>Cancelar</Text>
+                    <Text style={styles.cancelText}>Cancelar</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -259,17 +261,17 @@ const SearchComments = () => {
               <View style={styles.cardFooter}>
                 {!item.response && (
                   <TouchableOpacity
-                    style={[styles.actionButton, { backgroundColor: '#4CAF50' }]}
+                    style={[styles.editButton]}
                     onPress={() => handleEditComment(item.id)}
                   >
-                    <Text style={styles.actionText}>Editar</Text>
+                    <Text style={styles.editButtonText}>Editar</Text>
                   </TouchableOpacity>
                 )}
                 <TouchableOpacity
-                  style={[styles.actionButton, { backgroundColor: '#F44336' }]}
+                  style={[styles.deleteButton]}
                   onPress={() => handleDeleteComment(item.id)}
                 >
-                  <Text style={styles.actionText}>Remover</Text>
+                  <Text style={styles.deleteButtonText}>Remover</Text>
                 </TouchableOpacity>
               </View>
 
@@ -280,16 +282,16 @@ const SearchComments = () => {
                   <Text style={styles.responseText}>{item.response}</Text>
                   <View style={styles.buttonContainer}>
                     <TouchableOpacity
-                      style={[styles.actionButton, { backgroundColor: '#4CAF50' }]}
+                      style={[styles.editButton]}
                       onPress={() => handleEditResponse(item.id)}
                     >
-                      <Text style={styles.actionText}>Editar</Text>
+                      <Text style={styles.editButtonText}>Editar</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      style={[styles.actionButton, { backgroundColor: '#F44336' }]}
+                      style={[styles.deleteButton]}
                       onPress={() => handleDeleteResponse(item.id)}
                     >
-                      <Text style={styles.actionText}>Remover</Text>
+                      <Text style={styles.deleteButtonText}>Remover</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -463,20 +465,51 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 20,
   },
-  actionButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    marginTop: 10,
-    marginRight: 10,
+  editButton: {
+    backgroundColor: '#c8e6c9',
+    paddingVertical: 6,
+    paddingHorizontal: 14,
     borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#bbb',
-    flexDirection: 'row',
-    alignItems: 'center',
+    marginRight: 10,
   },
-  actionText: {
+  editButtonText: {
+    color: '#388e3c',
     fontWeight: 'bold',
-    color: 'white',
+    fontSize: width * 0.035,
+    },
+  deleteButton: {
+    backgroundColor: '#ffe5e5',
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    borderRadius: 6,
+  },
+  deleteButtonText: {
+    color: '#b71c1c',
+    fontWeight: 'bold',
+    fontSize: width * 0.035,
+  },
+  saveButton:{
+    backgroundColor: '#c8e6c9',
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    borderRadius: 6,
+    marginRight: 10,
+  },
+  saveText:{
+    color: '#388e3c',
+    fontWeight: 'bold',
+    fontSize: width * 0.035
+  },
+  cancelButton:{
+    backgroundColor: '#ffe5e5',
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    borderRadius: 6,
+  },
+  cancelText:{
+    color: '#b71c1c',
+    fontWeight: 'bold',
+    fontSize: width * 0.035,
   },
   modalOverlay: {
     position: 'absolute',
