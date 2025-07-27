@@ -15,7 +15,8 @@ const MAPPING = {
   'reply.bubble.fill': 'chat',    
   'apartment.building.fill': 'apartment', 
   'login.square.fill': 'login',
-  'profile.fill': 'account-circle'
+  'profile.fill': 'account-circle',
+  'folder.fill' : 'folder'
 } as Partial<
   Record<
     import('expo-symbols').SymbolViewProps['name'],
