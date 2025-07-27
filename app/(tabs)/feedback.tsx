@@ -82,7 +82,7 @@ const CommentRegistration = () => {
       // Monta o formato necessário para o DropDownPicker
       const formattedList = departmentsList.map((item) => ({
         label: item.nome, 
-        value: item.id || item.nome, 
+        value: item.nome, 
       }));
 
       setDepartments(formattedList);
