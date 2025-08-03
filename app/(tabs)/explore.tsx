@@ -15,7 +15,22 @@ import {
 import { Provider, Menu, Button } from 'react-native-paper';
 import { AntDesign } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const { width, height } = Dimensions.get('window');
+import * as Yup from "yup";
+import { Formik } from "formik";
+import DropDownPicker from 'react-native-dropdown-picker';
+
+
+
+const validationSchema = Yup.object().shape({
+    title: Yup.string()
+      .trim()
+      .max(50) 
+      .min(10, "O título tem que ter no mínimo 10 caracteres")
+      .required("O título é obrigatório."),
+        
+    commentType:Yup.string()
+      .required("O tipo de comentário é obrigatório."),
+});
 
 const SearchComments = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -30,6 +45,13 @@ const SearchComments = () => {
   const [editResponseModalVisible, setEditResponseModalVisible] = useState(false);
   const [responseToEdit, setResponseToEdit] = useState('');
   const [commentWithResponse, setCommentWithResponse] = useState(null);
+  const [openCommentType, setOpenCommentType] = useState(false);
+
+   const [commentTypeList, setCommentTypeList] = useState([
+          { label: "Crítica", value: "Crítica" },
+          { label: "Elogio", value: "Elogio" },
+          { label: "Sugestão", value: "Sugestão" }
+      ]);
 
   // Carrega os comentários do AsyncStorage
   const loadComments = async () => {
@@ -45,10 +67,7 @@ const SearchComments = () => {
 
   // Função para pesquisar comentários
   const handleSearch = () => {
-    if (!searchQuery.trim()) {
-      Alert.alert('Aviso', 'Por favor, preencha o campo de título antes de pesquisar.');
-      return;
-    }
+    console.log("pesquisando...")
     Alert.alert('Pesquisar', `Buscando por: ${searchQuery} - Tipo: ${searchType}`);
   };
 
@@ -133,46 +152,81 @@ const SearchComments = () => {
     <Provider>
       <View style={styles.outerContainer}>
         <Image source={require('../../assets/images/Fala_campus-logo.png')} style={styles.logo}  />
-        <View style={styles.container}>
-          <View style={styles.card}>
-            <Text style={styles.title}>Buscar Comentários</Text>
+            <Formik
+              initialValues={{
+                title: "",
+                commentType: "",
+              }}
+              validationSchema={validationSchema}
+              onSubmit={(()=>handleSearch()
+              )}
+            >
+              {({
+                handleChange,
+                handleBlur,
+                handleSubmit,
+                setFieldValue,
+                setFieldTouched,
+                values,
+                errors,
+                touched,
+                resetForm,
+              })=>(
+                
+                <View style={styles.container}>
+                  <View style={styles.card}>
+                    <Text style={styles.title}>Buscar Comentários</Text>
+                
+                  <Text style={styles.label}>Título: *</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={values.title}
+                    onChangeText={handleChange("title")}
+                    placeholder="Digite o título"
+                    placeholderTextColor="#333"
+                    onBlur={handleBlur("title")}
+                  />
+                  {touched.title && errors.title && (
+                    <Text style={{ color: "red" }}>{errors.title}</Text>
+                  )}
 
-            <Text style={styles.label}>Título: *</Text>
-            <TextInput
-              style={styles.input}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              placeholder="Digite o título"
-              placeholderTextColor="#333"
-              onBlur={() => Keyboard.dismiss()}
-            />
+                  <Text style={styles.label}>Tipo de Comentário: *</Text>
+                  <DropDownPicker
+                    open={openCommentType}
+                    value={values.commentType}
+                    items={commentTypeList}
+                    setOpen={setOpenCommentType} 
+                    setValue={(callback) => {
+                      const newValue = callback(values.commentType);
+                      setFieldValue("commentType", newValue);    
+                    }}
+                    setItems={setCommentTypeList}
+                    placeholder="Selecione um tipo "
+                    onClose={() => setFieldTouched("commentType", false)}    
+                    style={[styles.input]}
+                    dropDownContainerStyle={{ borderColor: "#ccc",zIndex: 1000 }}
+                    listMode="SCROLLVIEW"
+                  />
+                  {touched.commentType && errors.commentType && (
+                    <Text style={{ color: "red" }}>{errors.commentType}</Text>
+                  )}
 
-            <View style={styles.dropdownContainer}>
-              <Menu
-                visible={menuVisible}
-                onDismiss={() => setMenuVisible(false)}
-                anchor={
-                  <Button
-                    mode="outlined"
-                    onPress={() => setMenuVisible(true)}
-                    style={styles.dropdownButton}
-                    labelStyle={styles.dropdownButtonText}
+                  <TouchableOpacity 
+                    style={styles.searchButton} 
+                    onPress={()=>{
+                      handleSubmit()
+                    }}
                   >
-                    {searchType} <AntDesign name="down" size={14} color="black" />
-                  </Button>
-                }
-              >
-                <Menu.Item onPress={() => { setSearchType("Título"); setMenuVisible(false); }} title="Título" />
-                <Menu.Item onPress={() => { setSearchType("Autor"); setMenuVisible(false); }} title="Autor" />
-                <Menu.Item onPress={() => { setSearchType("Comentário"); setMenuVisible(false); }} title="Comentário" />
-              </Menu>
-            </View>
+                    <Text style={styles.buttonText}>Pesquisar</Text>
+                  </TouchableOpacity>
+                
+                  </View>
+                </View>
+                
+              )}
 
-            <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-              <Text style={styles.buttonText}>Pesquisar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+            </Formik>
+
 
         {editResponseModalVisible && (
             <View style={styles.modalOverlay}>
@@ -377,8 +431,7 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   searchButton: {
-    width: '100%',
-    marginTop: 20,
+    backgroundColor: '#4CAF50',
     padding: 15,
     borderRadius: 5,
     backgroundColor: '#4CAF50',

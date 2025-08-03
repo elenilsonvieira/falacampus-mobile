@@ -17,69 +17,69 @@ const LoginScreen = () => {
     
     <ScrollView contentContainerStyle={styles.scrollContainer}>
 
-    <View style={styles.logoContainer}>
+      <View style={styles.logoContainer}>
         <Image source={require('../../assets/images/Fala_campus-logo.png')} style={styles.logo} />
-        </View>
+      </View>
       
     
-        <View style={styles.container}>
+      <View style={styles.container}>
         
       
-      {/* Formulário de Login */}
-      <Formik
-        initialValues={{
-          matricula:"",
-          senha:""}
-        }
-        validationSchema={validationSchema}
-        onSubmit={(values) =>console.log(values)}
-      >
-        {({
-        handleChange,
-        handleSubmit,
-        values,
-        errors,
-        touched,
-        handleBlur,
-        }) => (
-          <>
-            <View style={styles.formContainer}>
-              <Text style={styles.title}>Login</Text>
-              <Text style={styles.label}>Matrícula: *</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Digite sua matrícula de aluno ou servidor"
-                value={values.matricula}
-                onChangeText={handleChange("matricula")}
-                onBlur={handleBlur("matricula")}
-              />
-              {touched.matricula && errors.matricula && (
-                <Text style={{ color: "red" }}>{errors.matricula}</Text>
-              )}
+        {/* Formulário de Login */}
+        <Formik
+          initialValues={{
+            matricula:"",
+            senha:""}
+          }
+          validationSchema={validationSchema}
+          onSubmit={(values) =>console.log(values)}
+        >
+          {({
+          handleChange,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+          handleBlur,
+          }) => (
+            <>
+              <View style={styles.formContainer}>
+                <Text style={styles.title}>Login</Text>
+                <Text style={styles.label}>Matrícula: *</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Digite sua matrícula de aluno ou servidor"
+                  value={values.matricula}
+                  onChangeText={handleChange("matricula")}
+                  onBlur={handleBlur("matricula")}
+                />
+                {touched.matricula && errors.matricula && (
+                  <Text style={{ color: "red" }}>{errors.matricula}</Text>
+                )}
 
-              <Text style={styles.label}>Senha: *</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Digite sua senha"
-                secureTextEntry
-                value={values.senha}
-                onChangeText={handleChange("senha")}
-                onBlur={handleBlur("senha")}
-              />
-              {touched.matricula && errors.senha && (
-                <Text style={{ color: "red" }}>{errors.senha}</Text>
-              )}
-              <TouchableOpacity 
-                style={styles.button}
-                onPress={() => handleSubmit()}
-                >
-                <Text style={styles.buttonText}>Entrar</Text>
-              </TouchableOpacity>
-            </View>
-          </>
-        )}
+                <Text style={styles.label}>Senha: *</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Digite sua senha"
+                  secureTextEntry
+                  value={values.senha}
+                  onChangeText={handleChange("senha")}
+                  onBlur={handleBlur("senha")}
+                />
+                {touched.matricula && errors.senha && (
+                  <Text style={{ color: "red" }}>{errors.senha}</Text>
+                )}
+                <TouchableOpacity 
+                  style={styles.button}
+                  onPress={() => handleSubmit()}
+                  >
+                  <Text style={styles.buttonText}>Entrar</Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
 
-      </Formik>
+        </Formik>
       
    </View>
   
