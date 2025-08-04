@@ -16,6 +16,7 @@ const { width, height } = Dimensions.get('window');
 export default function Feed() {
   const [comments, setComments] = useState<IComment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedComments, setExpandedComments] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
   const fetchComments = async () => {
@@ -35,6 +36,13 @@ export default function Feed() {
 }, []);
 
   const sortedComments = [...comments].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  
+  const toggleExpand = (id: string) => {
+  setExpandedComments(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
 
   
   return (
@@ -57,19 +65,38 @@ export default function Feed() {
                             <Text style={styles.labelBold}>Mensagem:</Text>
                             <Text style={styles.messageBox}>{comment.message}</Text>
 
-                            <View style={styles.cardFooter}>
+                            <View style={styles.cardFooterContainer}>
+                              <View style={styles.cardFooterLeft}>
                                 <Text
-                                style={[
+                                  style={[
                                     styles.cardStatus,
                                     comment.status === 'Respondido' ? styles.statusAnswered : styles.statusPending,
-                                ]}
+                                  ]}
                                 >
-                                {comment.status || 'Pendente'}
+                                  {comment.status || 'Pendente'}
                                 </Text>
-                                <Text style={styles.cardDate}>
-                                    Enviado em: {new Date(comment.date).toLocaleString('pt-BR')}
-                                </Text>
-                            </View>                            
+
+                                {comment.status === 'Respondido' && (
+                                  <Text
+                                    style={styles.detailButton}
+                                    onPress={() => toggleExpand(comment.id)}
+                                  >
+                                    {expandedComments[comment.id] ? "Ocultar detalhes" : "Ver detalhes"}
+                                  </Text>
+                                )}
+                              </View>
+
+                              <Text style={styles.cardDate}>
+                                Enviado em: {new Date(comment.date).toLocaleString('pt-BR')}
+                              </Text>
+                            </View>
+
+                            {comment.status === 'Respondido' && expandedComments[comment.id] && comment.response && (
+                              <View style={styles.replyBox}>
+                                <Text style={styles.labelBold}>Resposta do Departamento:</Text>
+                                <Text style={styles.replyText}>{comment.response}</Text>
+                              </View>
+                            )}                       
                         </View>
                     ))}
                 </View>   
@@ -248,5 +275,46 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 12,
     color: "#666",
-  }
+  },
+  detailButton: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 6,
+    fontWeight: 'bold',
+    fontSize: width * 0.035,
+    backgroundColor: '#d0e8ff',
+    color: '#0056b3',
+  },
+
+  replyBox: {
+    marginTop: 10,
+    marginBottom: 6,
+    backgroundColor: '#eef6ee',
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#cde3cd',
+    width: '100%',
+    alignSelf: 'center',
+  },
+
+  replyText: {
+    fontSize: 14,
+    color: '#333',
+    marginTop: 6,
+    lineHeight: 18,
+  },
+
+  cardFooterContainer: {
+  flexDirection: 'column',
+  gap: 8,
+},
+
+cardFooterLeft: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 16,
+},
+
 });
