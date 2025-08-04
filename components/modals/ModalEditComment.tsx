@@ -3,23 +3,39 @@ import { Text, TextInput, View } from "react-native";
 import * as Yup from "yup";
 import { Formik } from "formik";
 
-export type ModalDepartmentProps ={
+export type ModalCommentsProps ={
     editModalVisible:boolean;
-    editName: string;
-    setEditName: (name: string) => void;
     setEditModalVisible: (visible: boolean) => void;
+    editTitulo: string;
+    setEditTitulo: (name: string) => void;
     handleSaveEdit: () => void;
+    editComment: string;
+    setEditComment: (name: string) => void;
 
 };
 const validationSchema = Yup.object().shape({
-  nome: Yup.string()
+  titulo: Yup.string()
     .trim()
-    .min(5, "O campo tem que ter no mínimo 5 caracteres")
-    .max(30)
+    .min(5, "O título tem que ter no mínimo 5 caracteres")
+    .max(50," O título não pode ser maior que 50 caracteres")
+    .required("O nome do departamento é obrigatório."),
+    comentario: Yup.string()
+    .trim()
+    .min(5, "O comentário tem que ter no mínimo 5 caracteres")
+    .max(250," O comentário  não pode ser maior que 250 caracteres")
     .required("O nome do departamento é obrigatório."),
 });
 
-export default function ModalEditDepartment({editModalVisible,setEditModalVisible,editName,setEditName,handleSaveEdit }:ModalDepartmentProps){
+export default function ModalEditDepartment({
+    editModalVisible,
+    setEditModalVisible,
+    editTitulo,
+    setEditTitulo,
+    editComment,
+    setEditComment,
+    handleSaveEdit,
+
+    }:ModalCommentsProps){
 
     return(
         <Modal
@@ -30,9 +46,12 @@ export default function ModalEditDepartment({editModalVisible,setEditModalVisibl
         >
             <View style={styles.modalContainer}>
                 <View style={styles.modalContent}>
-                    <Text style={styles.modalText}>Editar Departamento</Text>
+                    <Text style={styles.modalText}>Editar Resposta da Administração</Text>
                     <Formik
-                      initialValues={{nome:editName}}
+                      initialValues={{
+                        titulo: editTitulo,
+                        comentario: editComment
+                      }}
                       validationSchema={validationSchema}
                       onSubmit={()=> handleSaveEdit()}
                     >
@@ -45,19 +64,36 @@ export default function ModalEditDepartment({editModalVisible,setEditModalVisibl
                         handleBlur, 
                       })=>(
                         <>
+                            <Text style={styles.modalText}>Editar Título</Text>
                           <TextInput
                             style={styles.input}
-                            placeholder="Nome do Departamento"
-                            value={values.nome}
+                            placeholder="Digite o título"
+                            value={values.titulo}
                             onChangeText={(text) => {
-                              handleChange("nome")(text);
-                              setEditName(text);
+                              handleChange("titulo")(text);
+                              setEditTitulo(text);
                             }}
-                            onBlur={handleBlur("nome")}
+                            onBlur={handleBlur("titulo")}
                           />
-                          {touched.nome && errors.nome && (
-                            <Text style={{ color: "red", marginBottom: 20 }}>{errors.nome}</Text>
+                          {touched.titulo && errors.titulo && (
+                            <Text style={{ color: "red", marginBottom: 20 }}>{errors.titulo}</Text>
                           )}
+                            <Text style={styles.modalText}>Editar Comentário</Text>
+                          <TextInput
+                            style={styles.inputComment}
+                            placeholder="Digite o comentário"
+                            value={values.comentario}
+                            multiline={true}
+                            onChangeText={(text) => {
+                                handleChange("cometario")(text);
+                                setEditComment(text);
+                            }}
+                            onBlur={handleBlur("cometario")}
+                          />
+                          {touched.comentario && errors.comentario && (
+                            <Text style={{ color: "red", marginBottom: 20 }}>{errors.comentario}</Text>
+                          )}
+
                           <View style={styles.modalButtons}>
                               <TouchableOpacity
                               style={styles.modalButton}
@@ -125,5 +161,13 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginBottom: 10,
+  },
+  inputComment: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+    height:100
   },
 });

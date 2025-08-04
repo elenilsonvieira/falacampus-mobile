@@ -3,23 +3,23 @@ import { Text, TextInput, View } from "react-native";
 import * as Yup from "yup";
 import { Formik } from "formik";
 
-export type ModalDepartmentProps ={
+export type ModalResponseProps ={
     editModalVisible:boolean;
-    editName: string;
-    setEditName: (name: string) => void;
+    editResponse: string;
+    setEditResponse: (name: string) => void;
     setEditModalVisible: (visible: boolean) => void;
     handleSaveEdit: () => void;
 
 };
 const validationSchema = Yup.object().shape({
-  nome: Yup.string()
+  response: Yup.string()
     .trim()
     .min(5, "O campo tem que ter no mínimo 5 caracteres")
-    .max(30)
+    .max(250," A resposta não pode ser maior que 250 caracteres")
     .required("O nome do departamento é obrigatório."),
 });
 
-export default function ModalEditDepartment({editModalVisible,setEditModalVisible,editName,setEditName,handleSaveEdit }:ModalDepartmentProps){
+export default function ModalEditDepartment({editModalVisible,setEditModalVisible,editResponse,setEditResponse,handleSaveEdit }:ModalResponseProps){
 
     return(
         <Modal
@@ -30,9 +30,9 @@ export default function ModalEditDepartment({editModalVisible,setEditModalVisibl
         >
             <View style={styles.modalContainer}>
                 <View style={styles.modalContent}>
-                    <Text style={styles.modalText}>Editar Departamento</Text>
+                    <Text style={styles.modalText}>Editar Resposta da Administração</Text>
                     <Formik
-                      initialValues={{nome:editName}}
+                      initialValues={{response:editResponse}}
                       validationSchema={validationSchema}
                       onSubmit={()=> handleSaveEdit()}
                     >
@@ -47,16 +47,17 @@ export default function ModalEditDepartment({editModalVisible,setEditModalVisibl
                         <>
                           <TextInput
                             style={styles.input}
-                            placeholder="Nome do Departamento"
-                            value={values.nome}
+                            placeholder="Digite a resposta"
+                            value={values.response}
+                           multiline={true}
                             onChangeText={(text) => {
-                              handleChange("nome")(text);
-                              setEditName(text);
+                              handleChange("response")(text);
+                              setEditResponse(text);
                             }}
-                            onBlur={handleBlur("nome")}
+                            onBlur={handleBlur("response")}
                           />
-                          {touched.nome && errors.nome && (
-                            <Text style={{ color: "red", marginBottom: 20 }}>{errors.nome}</Text>
+                          {touched.response&& errors.response && (
+                            <Text style={{ color: "red", marginBottom: 20 }}>{errors.response}</Text>
                           )}
                           <View style={styles.modalButtons}>
                               <TouchableOpacity
@@ -125,5 +126,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginBottom: 10,
+    height:100
   },
 });
