@@ -10,3 +10,16 @@ export interface IComment {
   response?: string;
   
 }
+
+//Estrutura do backend
+// export interface IComment {
+//   id: number;
+//   title: string;
+//   message: string;
+//   creationDate: string;
+//   commentType: string;
+//   statusComment: string;
+//   authorId: number;
+//   departmentId: number;
+//   answerId?: number | null;
+// }

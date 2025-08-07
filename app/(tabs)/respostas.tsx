@@ -17,7 +17,8 @@ const { width, height } = Dimensions.get('window');
 export default function Respostas() {
   const [comments, setComments] = useState<IComment[]>([]);
   const [loading, setLoading] = useState(true);
-  
+  const [filter, setFilter] = useState<'todos' | 'respondidos' | 'nao_respondidos'>('todos');
+
   // Buscar as mensagens salvas no AsyncStorage ao carregar a página
   useEffect(() => {
   const fetchComments = async () => {
@@ -44,14 +45,40 @@ export default function Respostas() {
         <Image source={require('../../assets/images/Fala_campus-logo.png')} style={styles.logo} />
       </View>
       <Text style={styles.topTitle}>Mensagens Recebidas</Text>
+      <View style={styles.filterContainer}>
+        <TouchableOpacity
+          style={[styles.filterButton, filter === 'todos' && styles.activeFilter]}
+          onPress={() => setFilter('todos')}
+        >
+          <Text style={styles.filterText}>Todos</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.filterButton, filter === 'respondidos' && styles.activeFilter]}
+          onPress={() => setFilter('respondidos')}
+        >
+          <Text style={styles.filterText}>Respondidos</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.filterButton, filter === 'nao_respondidos' && styles.activeFilter]}
+          onPress={() => setFilter('nao_respondidos')}
+        >
+          <Text style={styles.filterText}>Não Respondidos</Text>
+        </TouchableOpacity>
+      </View>
+
       {loading ? (
   <Text style={{ textAlign: 'center', marginTop: 20 }}>Carregando mensagens...</Text>
 ) : comments.length === 0 ? (
   <Text style={{ textAlign: 'center', marginTop: 20 }}>Nenhuma mensagem encontrada.</Text>
 ) : (
   <View style={styles.card}>
-    {sortedComments // Ordena do mais recente para o mais antigo
-        .map((comment) => (
+    {sortedComments // Ordena do mais recente para o mais antigo.
+        .filter((comment) => { //Filtra os comentarios.
+          if (filter === 'respondidos') return comment.status === 'Respondido';
+          if (filter === 'nao_respondidos') return comment.status !== 'Respondido';
+          return true;
+        })
+        .map((comment) => (//Itera cada comentario e mostra na tela.
         <View key={comment.id} style={styles.messageCard}>
           <Text style={styles.cardAuthor}>Autor: {comment.author}</Text>
           <Text style={styles.cardDate}>
@@ -216,4 +243,29 @@ const styles = StyleSheet.create({
     color: '#333',
     fontWeight: 'bold',
   },
+  filterContainer: {
+  flexDirection: 'row',
+  justifyContent: 'center',
+  marginBottom: 20,
+  gap: 10,
+  flexWrap: 'wrap',
+},
+  filterButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    backgroundColor: '#f5f5f5',
+  },
+  filterText: {
+    fontSize: width * 0.035,
+    color: '#333',
+    fontWeight: 'bold',
+  },
+  activeFilter: {
+    backgroundColor: '#c8e6c9',
+    borderColor: '#388e3c',
+  },
+
 });
