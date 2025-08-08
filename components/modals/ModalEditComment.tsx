@@ -46,7 +46,7 @@ export default function ModalEditDepartment({
         >
             <View style={styles.modalContainer}>
                 <View style={styles.modalContent}>
-                    <Text style={styles.modalText}>Editar Resposta da Administração</Text>
+                    
                     <Formik
                       initialValues={{
                         titulo: editTitulo,
