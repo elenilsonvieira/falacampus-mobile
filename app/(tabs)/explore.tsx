@@ -28,21 +28,19 @@ import ResponseAdm from "@/components/response/ResponseAdm";
 import CommentComponent from "@/components/comment/Comment";
 
 
-
+// Remova a validação de 'required' para o tipo, ou trate 'Todos os tipos' como válido
 const validationSchema = Yup.object().shape({
   title: Yup.string()
     .trim()
-    .max(50)
-    .min(10, "O título tem que ter no mínimo 10 caracteres")
-    .required("O título é obrigatório."),
-
-  commentType: Yup.string().required("O tipo de comentário é obrigatório."),
+    .max(50),
+  // type: Yup.string().required("Por favor, selecione um tipo de comentário.") // Descomente se quiser tornar opcional
 });
 
 const SearchComments = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchType, setSearchType] = useState("Buscar por");
+  const [searchType, setSearchType] = useState("Buscar por"); 
   const [comments, setComments] = useState<IComment[]>([]);
+  const [filteredComments, setFilteredComments] = useState<IComment[]>([]); 
   const [refreshing, setRefreshing] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editedTitle, setEditedTitle] = useState("");
@@ -51,7 +49,7 @@ const SearchComments = () => {
   const [editResponseModalVisible, setEditResponseModalVisible] = useState(false);
   const [responseToEdit, setResponseToEdit] = useState("");
   const [commentWithResponse, setCommentWithResponse] = useState(null);
-  const [openCommentType, setOpenCommentType] = useState(false);
+  const [opentype, setOpentype] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [modalText, setModalText] = useState("");
   const [selectedIten, setSelectedIten] = useState({})
@@ -59,7 +57,8 @@ const SearchComments = () => {
   const [menuVisible, setMenuVisible] = useState(false);
   
 
-  const [commentTypeList, setCommentTypeList] = useState([
+  const [typeList, settypeList] = useState([
+    { label: "Todos os tipos", value: "" }, // Adicionado "Todos os tipos" com valor vazio
     { label: "Crítica", value: "Crítica" },
     { label: "Elogio", value: "Elogio" },
     { label: "Sugestão", value: "Sugestão" },
@@ -70,25 +69,55 @@ const SearchComments = () => {
     try {
       const storedComments = await AsyncStorage.getItem("comments");
       if (storedComments) {
-        setComments(JSON.parse(storedComments));
+        const parsedComments = JSON.parse(storedComments);
+        // Garante que todos os comentários carregados sejam normalizados para 'type'
+        const normalizedComments = parsedComments.map(comment => ({
+          ...comment,
+          // Se o campo for 'commentType' (do código anterior), renomeie para 'type'
+          // Isso é importante para compatibilidade com dados antigos
+          type: comment.type || (comment as any).commentType, // Usar 'as any' para evitar erro de tipo se 'commentType' não estiver em IComment
+          commentType: undefined // Remove a propriedade antiga 'commentType' se existir
+        }));
+        setComments(normalizedComments);
+        setFilteredComments(normalizedComments); // Inicialmente, todos os comentários são mostrados
       }
     } catch (error) {
       Alert.alert("Erro", "Ocorreu um erro ao carregar os comentários.");
     }
   };
 
-  // Função para pesquisar comentários
-  const handleSearch = () => {
-    console.log("pesquisando...");
-    Alert.alert(
-      "Pesquisar",
-      `Buscando por: ${searchQuery} - Tipo: ${searchType}`
-    );
+  // Função para pesquisar e filtrar comentários
+  const handleFilterComments = (values) => {
+    console.log("Filtrando comentários por tipo:", values.type);
+    const { title, type } = values;
+
+    // Normaliza o valor do tipo de comentário para garantir a correspondência
+    const normalizedType = type.trim();
+
+    let filtered = [];
+    if (normalizedType === "") { // Se "Todos os tipos" for selecionado (valor vazio)
+      filtered = comments;
+      Alert.alert(
+        "Pesquisar",
+        "Mostrando todos os comentários."
+      );
+    } else {
+      filtered = comments.filter(comment => {
+        // Garante que o comment.type também seja normalizado para comparação
+        return comment.type && comment.type.trim() === normalizedType;
+      });
+      Alert.alert(
+        "Pesquisar",
+        `Comentários filtrados por tipo: ${type}`
+      );
+    }
+    setFilteredComments(filtered);
   };
 
   // Função para atualizar a lista de comentários
   const onRefresh = () => {
     setRefreshing(true);
+    // Recarrega todos os comentários e reinicia a lista filtrada para mostrar todos novamente
     loadComments().then(() => setRefreshing(false));
   };
 
@@ -100,6 +129,7 @@ const SearchComments = () => {
   const handleDeleteComment = async (id:string) => {
     const updatedComments = comments.filter((comment) => comment.id !== id);
     setComments(updatedComments);
+    setFilteredComments(updatedComments); // Atualiza também os filtrados
     await AsyncStorage.setItem("comments", JSON.stringify(updatedComments));
   };
 
@@ -126,6 +156,7 @@ const SearchComments = () => {
     );
 
     setComments(updatedComments);
+    setFilteredComments(updatedComments); // Atualiza também os filtrados
     await AsyncStorage.setItem("comments", JSON.stringify(updatedComments));
     setEditModalVisible(false);
     setCommentToEdit(null);
@@ -145,6 +176,7 @@ const SearchComments = () => {
       comment.id === id ? { ...comment, response: "" } : comment
     );
     setComments(updatedComments);
+    setFilteredComments(updatedComments); // Atualiza também os filtrados
     await AsyncStorage.setItem("comments", JSON.stringify(updatedComments));
   };
 
@@ -156,6 +188,7 @@ const SearchComments = () => {
     );
 
     setComments(updatedComments);
+    setFilteredComments(updatedComments); // Atualiza também os filtrados
     await AsyncStorage.setItem("comments", JSON.stringify(updatedComments));
     setEditResponseModalVisible(false);
     setCommentWithResponse(null);
@@ -186,10 +219,10 @@ const SearchComments = () => {
         <Formik
           initialValues={{
             title: "",
-            commentType: "",
+            type: "", // Definir o valor inicial para "Todos os tipos"
           }}
           validationSchema={validationSchema}
-          onSubmit={() => handleSearch()}
+          onSubmit={handleFilterComments} 
         >
           {({
             handleChange,
@@ -221,33 +254,41 @@ const SearchComments = () => {
 
                 <Text style={styles.label}>Tipo de Comentário: *</Text>
                 <DropDownPicker
-                  open={openCommentType}
-                  value={values.commentType}
-                  items={commentTypeList}
-                  setOpen={setOpenCommentType}
+                  open={opentype}
+                  value={values.type}
+                  items={typeList}
+                  setOpen={setOpentype}
                   setValue={(callback) => {
-                    const newValue = callback(values.commentType);
-                    setFieldValue("commentType", newValue);
+                    const newValue = callback(values.type);
+                    setFieldValue("type", newValue);
+                    // Disparar a filtragem automaticamente quando o tipo muda
+                    if (newValue === "") { // Se "Todos os tipos" for selecionado
+                      setFilteredComments(comments);
+                      Alert.alert("Filtro", "Mostrando todos os comentários.");
+                    } else {
+                      handleSubmit(); // Dispara o onSubmit do Formik para filtrar
+                    }
                   }}
-                  setItems={setCommentTypeList}
+                  setItems={settypeList}
                   placeholder="Selecione um tipo "
-                  onClose={() => setFieldTouched("commentType", false)}
+                  onClose={() => setFieldTouched("type", true)}
                   style={[styles.input]}
                   dropDownContainerStyle={{ borderColor: "#ccc", zIndex: 1000 }}
                   listMode="SCROLLVIEW"
                 />
-                {touched.commentType && errors.commentType && (
-                  <Text style={{ color: "red" }}>{errors.commentType}</Text>
+                {touched.type && errors.type && (
+                  <Text style={{ color: "red" }}>{errors.type}</Text>
                 )}
 
                 <TouchableOpacity
                   style={styles.searchButton}
                   onPress={() => {
-                    handleSubmit();
+                    handleSubmit(); // Este botão ainda pode ser usado para filtrar após preencher o título
                   }}
                 >
                   <Text style={styles.buttonText}>Pesquisar</Text>
                 </TouchableOpacity>
+
               </View>
             </View>
           )}
@@ -283,7 +324,7 @@ const SearchComments = () => {
         <View style={styles.responseCard}>
           <Text style={styles.responseTitle}>Comentários Enviados</Text>
           <FlatList
-            data={comments}
+            data={filteredComments} 
             keyExtractor={(item) => item.id}
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
