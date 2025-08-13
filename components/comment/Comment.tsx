@@ -21,8 +21,8 @@ export default function CommentComponent({children, handleEditComment,setSelecte
             <View style={styles.commentContent}>
                 <Text style={styles.commentTitle}>{item.title}</Text>
                 <Text style={styles.commentText}>{item.message}</Text>
-                <Text style={styles.commentStatus}><b>Autor</b>: {item.author}</Text>
-                <Text style={styles.commentStatus}><b>Status</b>: {item.status}</Text>
+                <Text style={styles.commentStatus}>Autor: {item.author}</Text>
+                <Text style={styles.commentStatus}>Status: {item.status}</Text>
             </View>
 
             {/* Botões principais */}
@@ -89,6 +89,7 @@ const styles = StyleSheet.create({
   commentStatus: {
     fontSize: 12,
     color: '#666',
+    fontWeight: 'bold',
   },
   cardFooter: {
     flexDirection: 'row',
