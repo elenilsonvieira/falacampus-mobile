@@ -16,7 +16,8 @@ const MAPPING = {
   'apartment.building.fill': 'apartment', 
   'login.square.fill': 'login',
   'profile.fill': 'account-circle',
-  'folder.fill' : 'folder'
+  'folder.fill' : 'folder',
+  'logout.square.fill':'logout'
 } as Partial<
   Record<
     import('expo-symbols').SymbolViewProps['name'],

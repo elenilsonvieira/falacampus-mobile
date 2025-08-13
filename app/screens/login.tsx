@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView } from "react-native";
 import * as Yup from "yup";
 import { Formik } from "formik";
+import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios, { AxiosError } from "axios";
 
 const validationSchema = Yup.object().shape({
   matricula: Yup.string()
@@ -12,6 +15,50 @@ const validationSchema = Yup.object().shape({
 });
 
 const LoginScreen = () => {
+
+  const handleLogin = async ( values:{matricula:string, senha:string}) =>{
+
+    const login ={
+      username:values.matricula,
+      password: values.senha
+    }
+    { try {
+      const response = await axios.post('http://localhost:8080/api/login' ,login)
+
+      if(response.status === 200){
+
+          const token = response.data.token;
+          const user = response.data.user;
+          const authority = user.roles[0].authority;
+          
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          await AsyncStorage.setItem('auth_token', token);
+          
+          console.log('Login success:');
+          if (authority === 'ADMIN') {
+          router.replace({
+            pathname: '../(adminTabs)/feed' ,
+            params: { userData: JSON.stringify(user) } 
+          });
+    
+          console.log( JSON.stringify(user))// para saber o q ta saindo, pretenção usar para montar o perfil
+        } else {
+          router.replace({
+            pathname: '../(userTabs)/feed',
+            params: { userData: JSON.stringify(user) } 
+          });
+    
+        }
+      }else{
+        //adicionar mensagem para usuario de requisicao invalida
+        console.log("deu erro")
+      }
+    
+    } catch (error) {
+      
+      console.error('Login failed:', AxiosError);
+    }}
+  }
 
   return (
     
@@ -32,7 +79,7 @@ const LoginScreen = () => {
             senha:""}
           }
           validationSchema={validationSchema}
-          onSubmit={(values) =>console.log(values)}
+          onSubmit={(values) =>handleLogin(values)}
         >
           {({
           handleChange,

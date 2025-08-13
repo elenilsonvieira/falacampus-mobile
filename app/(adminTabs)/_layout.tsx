@@ -7,14 +7,14 @@ import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 // Importação das telas
-import HomeScreen from '../(tabs)/index';
-import FeedbackScreen from '../(tabs)/feedback';
-import ExploreScreen from '../(tabs)/explore';
-import RespostasScreen from '../(tabs)/respostas';
-import DepsScreen from '../(tabs)/deps';
-import LoginScreen from '../(tabs)/login';
-import UserScreen from '../(tabs)/user';
-import FeedScreen from '../(tabs)/feed';
+
+import FeedbackScreen from '../(adminTabs)/feedback';
+import ExploreScreen from '../(adminTabs)/explore';
+import RespostasScreen from '../(adminTabs)/respostas';
+import DepsScreen from '../(adminTabs)/deps';
+import LogoutScreen from '../screens/logout';
+import UserScreen from '../(adminTabs)/user';
+import FeedScreen from '../(adminTabs)/feed';
 
 
 const Drawer = createDrawerNavigator();
@@ -33,11 +33,25 @@ export default function DrawerLayout() {
         },
       }}
     >
-      <Drawer.Screen
+      {/* <Drawer.Screen
         name="Home"
         component={HomeScreen}
         options={{
           drawerIcon: ({ color }) => <IconSymbol size={24} name="home.fill" color={color} />,
+        }}
+      /> */}
+      <Drawer.Screen
+        name="Feed"
+        component={FeedScreen}
+        options={{
+          drawerIcon: ({ color }) => <IconSymbol size={24} name="folder.fill" color={color} />,
+        }}
+      />
+      <Drawer.Screen
+        name="Perfil"
+        component={UserScreen}
+        options={{
+          drawerIcon: ({ color }) => <IconSymbol size={24} name="profile.fill" color={color} />,
         }}
       />
       <Drawer.Screen
@@ -69,26 +83,21 @@ export default function DrawerLayout() {
         }}
       />
       <Drawer.Screen
+        name="Sair"
+        component={LogoutScreen}
+        options={{
+          drawerIcon: ({ color }) => <IconSymbol size={24} name="logout.square.fill" color={color} />,
+        }}
+      />
+      
+      {/* <Drawer.Screen
         name="Login"
         component={LoginScreen}
         options={{
           drawerIcon: ({ color }) => <IconSymbol size={24} name="login.square.fill" color={color} />,
         }}
-      />
-      <Drawer.Screen
-        name="Perfil"
-        component={UserScreen}
-        options={{
-          drawerIcon: ({ color }) => <IconSymbol size={24} name="profile.fill" color={color} />,
-        }}
-      />
-      <Drawer.Screen
-        name="Feed"
-        component={FeedScreen}
-        options={{
-          drawerIcon: ({ color }) => <IconSymbol size={24} name="folder.fill" color={color} />,
-        }}
-      />
+      /> */}
+
     </Drawer.Navigator>
   );
 }
