@@ -6,45 +6,89 @@ import {
   ScrollView,
   Image,
   Dimensions,
+  Alert,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IComment } from "@/interface/IComment";
+import axios from "axios";
+import { IAnswer } from "@/interface/IAnswer";
+import { IUser } from "@/interface/IUser";
+import { IDepartment } from "@/interface/IDepartment";
 
 const { width, height } = Dimensions.get('window');
 
 
 export default function Feed() {
+
   const [comments, setComments] = useState<IComment[]>([]);
+  const [answers, setAnswers] = useState<IAnswer[]>([]);
+  const [users, setUsers] = useState<IUser[]>([]);
+  const [departments, setDepartments] = useState<IDepartment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [expandedComments, setExpandedComments] = useState<{ [key: string]: boolean }>({});
+  const [expandedComments, setExpandedComments] = useState<{ [key: number]: boolean }>({});
 
   useEffect(() => {
-  const fetchComments = async () => {
-    try {
-      const existingComments = await AsyncStorage.getItem('comments');
-      if (existingComments) {
-        setComments(JSON.parse(existingComments));
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  fetchComments();
-}, []);
-
-  const sortedComments = [...comments].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const fetchComments = async () => {
+      try {
+        
+        const[commentsRes, answersRes, usersRes, departmentsRes] = await Promise.all([
+          axios.get("http://localhost:8080/api/comment/all"),
+          axios.get("http://localhost:8080/api/answer/all"),
+          axios.get("http://localhost:8080/api/user/all"),
+          axios.get("http://localhost:8080/api/departament/all")
+        ])
   
-  const toggleExpand = (id: string) => {
+        if (commentsRes.status === 200) {
+          setComments(commentsRes.data);
+        }
+        
+        if (answersRes.status === 200){          
+          setAnswers(answersRes.data);
+        }
+
+        if (usersRes.status === 200){
+          setUsers(usersRes.data);
+        }
+
+        if(departmentsRes.status === 200){
+          setDepartments(departmentsRes.data);
+        }
+
+      } catch (error) {
+        console.log(error); 
+        Alert.alert("Erro", "Ocorreu um erro ao carregar os dados.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchComments();
+  }, []);
+  
+  const toggleExpand = (id: number) => {
   setExpandedComments(prev => ({
       ...prev,
       [id]: !prev[id]
     }));
   };
 
-  
+  //Pega Resposta do comentario por ID
+  const getAnswerMessage = (answerId?: number | null) => {
+    const answer = answers.find((a)=>a.id === answerId);
+    return answer;
+  };
+
+  //Pega o nome do usuario pelo ID
+  const getAuthorName = (authorId?: number | null) => {
+    const user = users.find((u)=>u.id === authorId);    
+    return user;
+  };
+
+  //Pega o Nome do departamento pelo ID
+  const getDepartmentName = (departamentId?: number | null) => {
+    const departament = departments.find((d)=> Number(d.id) === departamentId);
+    return departament;
+  };
+
   return (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
             <Image source={require('../../assets/images/Fala_campus-logo.png')} style={styles.logo} />
@@ -55,13 +99,13 @@ export default function Feed() {
             <Text style={{ textAlign: 'center', marginTop: 20 }}>Nenhum Comentário encontrado.</Text>
             ) : (
                 <View>
-                    {sortedComments // Ordena do mais recente para o mais antigo
+                    {comments
                     .map((comment) => (
                         <View key={comment.id} style={styles.messageCard}>
-                            <Text><Text style={styles.labelBold}>Autor:</Text> <Text style={styles.value}>{comment.author}</Text></Text>
+                            <Text><Text style={styles.labelBold}>Autor:</Text> <Text style={styles.value}>{getAuthorName(comment.authorId)?.name}</Text></Text>
                             <Text><Text style={styles.labelBold}>Título:</Text> <Text style={styles.value}>{comment.title}</Text></Text>
-                            <Text><Text style={styles.labelBold}>Tipo:</Text> <Text style={styles.value}>{comment.type}</Text></Text>
-                            <Text><Text style={styles.labelBold}>Departamento:</Text> <Text style={styles.value}>{comment.department}</Text></Text>
+                            <Text><Text style={styles.labelBold}>Tipo:</Text> <Text style={styles.value}>{comment.commentType}</Text></Text>
+                            <Text><Text style={styles.labelBold}>Departamento:</Text> <Text style={styles.value}>{getDepartmentName(comment.departamentId)?.name}</Text></Text>
                             <Text style={styles.labelBold}>Mensagem:</Text>
                             <Text style={styles.messageBox}>{comment.message}</Text>
 
@@ -70,13 +114,13 @@ export default function Feed() {
                                 <Text
                                   style={[
                                     styles.cardStatus,
-                                    comment.status === 'Respondido' ? styles.statusAnswered : styles.statusPending,
+                                    comment.statusComment === 'SOLVED' ? styles.statusAnswered : styles.statusPending,
                                   ]}
                                 >
-                                  {comment.status || 'Pendente'}
+                                  {comment.statusComment || 'NOT_SOLVED'}
                                 </Text>
 
-                                {comment.status === 'Respondido' && (
+                                {comment.statusComment === 'SOLVED' && (
                                   <Text
                                     style={styles.detailButton}
                                     onPress={() => toggleExpand(comment.id)}
@@ -87,14 +131,14 @@ export default function Feed() {
                               </View>
 
                               <Text style={styles.cardDate}>
-                                Enviado em: {new Date(comment.date).toLocaleString('pt-BR')}
+                                Enviado em: {comment.creationDate}
                               </Text>
                             </View>
 
-                            {comment.status === 'Respondido' && expandedComments[comment.id] && comment.response && (
+                            {comment.statusComment === 'SOLVED' && expandedComments[comment.id] && comment.answerId && (
                               <View style={styles.replyBox}>
                                 <Text style={styles.labelBold}>Resposta do Departamento:</Text>
-                                <Text style={styles.replyText}>{comment.response}</Text>
+                                <Text style={styles.replyText}>{getAnswerMessage(comment.answerId)?.message}</Text>
                               </View>
                             )}                       
                         </View>

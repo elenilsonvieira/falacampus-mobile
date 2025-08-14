@@ -1,7 +1,7 @@
 export interface IAnswer {
   id: number;
   message: string;
-  commnetId: number;
+  commentId: number;
   creationDate: string;
   authorId: number;
 }
