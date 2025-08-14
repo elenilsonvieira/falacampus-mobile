@@ -12,6 +12,7 @@ import FeedbackScreen from '../(userTabs)/feedback';
 import ExploreScreen from '../(userTabs)/explore';
 import UserScreen from '../(userTabs)/user';
 import FeedScreen from '../(userTabs)/feed';
+import LogoutScreen from '../screens/logout';
 
 
 const Drawer = createDrawerNavigator();
@@ -57,6 +58,13 @@ export default function DrawerLayout() {
         component={ExploreScreen}
         options={{
           drawerIcon: ({ color }) => <IconSymbol size={24} name="mycomments.fill" color={color} />,
+        }}
+      />
+      <Drawer.Screen
+        name="Sair"
+        component={LogoutScreen}
+        options={{
+          drawerIcon: ({ color }) => <IconSymbol size={24} name="logout.square.fill" color={color} />,
         }}
       />
       

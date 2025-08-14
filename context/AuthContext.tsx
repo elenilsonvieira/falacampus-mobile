@@ -19,68 +19,67 @@ export type ChildrenProps = {
 };
 
 export default function AuthContextProvider({ children }: ChildrenProps) {
-    const navigation = useNavigation();
-    const [dataUser, setDataUser] = useState<IUser>()
+  const [dataUser, setDataUser] = useState<IUser>()
 
-    const login = async(values:ILogin)=>{
+  const login = async(values:ILogin)=>{
 
-        try {
-        const response = await axios.post(
-          "http://localhost:8080/api/login",
-          values
-        );
-
-        if (response.status === 200) {
-          const token = response.data.token;
-          const user = response.data.user;
-          const authority = user.roles[0].authority;
-          
-          setDataUser(user)
-
-          axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-          await AsyncStorage.setItem("auth_token", token);
-          
-          console.log("Login success");
-          if (authority === "ADMIN") {
-            router.replace({
-              pathname: "../(adminTabs)/feed",
-              
-            });
-
-          } else {
-            router.replace({
-              pathname: "../(userTabs)/feed",  
-            });
-          }
-        } else {
-          //adicionar mensagem para usuario de requisicao invalida
-          console.log("deu erro");
-        }
-      } catch (error) {
-        console.error("Login failed:", AxiosError);
-      }
-    }
-
-    const logout = async()=>{
       try {
-        const token = AsyncStorage.getItem('auth_token');
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        const response = await axios.post('http://localhost:8080/api/logout' );
+      const response = await axios.post(
+        "http://localhost:8080/api/login",
+        values
+      );
 
-        if(response.status === 200){
-          delete axios.defaults.headers.common['Authorization'];
-          await AsyncStorage.removeItem('userToken');
-
-          setTimeout(() => {  
-           router.replace("/")
-          }, 1000);
-        }
+      if (response.status === 200) {
+        const token = response.data.token;
+        const user = response.data.user;
+        const authority = user.roles[0].authority;
         
-      } catch (error) {
-        console.log(error);
+        setDataUser(user)
+
+        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+        await AsyncStorage.setItem("auth_token", token);
+        
+        console.log("Login success");
+        if (authority === "ADMIN") {
+          router.replace({
+            pathname: "../(adminTabs)/feed",
+            
+          });
+
+        } else {
+          router.replace({
+            pathname: "../(userTabs)/feed",  
+          });
+        }
+      } else {
+        //adicionar mensagem para usuario de requisicao invalida
+        console.log("deu erro");
+      }
+    } catch (error) {
+      console.error("Login failed:", AxiosError);
+    }
+  }
+
+  const logout = async()=>{
+    try {
+      const token = AsyncStorage.getItem('auth_token');
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      const response = await axios.post('http://localhost:8080/api/logout' );
+
+      if(response.status === 200){
+        delete axios.defaults.headers.common['Authorization'];
+        await AsyncStorage.removeItem('userToken');
+
+        setTimeout(() => {  
+          router.replace("/")
+        }, 1000);
       }
       
+    } catch (error) {
+      console.log(error);
     }
+    
+  }
 
     
   return (

@@ -21,7 +21,7 @@ export default function Department({nome,handleEdit,handleDeleteConfirmation}:De
     <Card style={styles.card}>
       <Card.Content style={styles.headerContainer}>
         <View style={styles.textContainer}>
-          <Text variant="titleMedium" numberOfLines={2}>{nome}</Text>
+          <Text variant="titleMedium" numberOfLines={3}>{nome}</Text>
         </View>
 
         <View style={styles.iconsContainer}>

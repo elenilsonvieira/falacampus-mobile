@@ -80,7 +80,7 @@ export default function DrawerLayout() {
         name="Sair"
         component={LogoutScreen}
         options={{
-          drawerIcon: ({ color }) => <IconSymbol size={24} name="logout.square.fill" color={color} />,
+          drawerIcon: ({ color }) => <IconSymbol size={24} name="logout.square.fill" color={color}  />,
         }}
       />
       

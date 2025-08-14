@@ -7,7 +7,6 @@ import {
   Alert,
   FlatList,
   RefreshControl,
-
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect } from "expo-router";
@@ -16,28 +15,44 @@ import Department from "@/components/departament/Department";
 import { IDepartment } from "@/interface/IDepartment";
 import ModalEditDepartment from "@/components/modals/ModalEditDepartment";
 import CreateDepButton from "@/components/button/CreateDepButton";
+import axios from "axios";
 
 const Departamentos = () => {
   const [departments, setDepartments] = useState<IDepartment[]>([]);
-  const [selectedDepartment, setSelectedDepartment] =useState<IDepartment | null>(null);
+  const [selectedDepartment, setSelectedDepartment] =
+    useState<IDepartment | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editName, setEditName] = useState("");
 
   // Carrega os departamentos salvos
+  // const loadDepartments = async () => {
+  //   try {
+  //     const keys = await AsyncStorage.getAllKeys();
+  //     const departmentKeys = keys.filter((key) =>
+  //       key.startsWith("department_")
+  //     );
+  //     const departmentsData = await AsyncStorage.multiGet(departmentKeys);
+  //     const departmentsList = departmentsData.map(([key, value]) =>
+  //       JSON.parse(value!)
+  //     );
+
+  //     setDepartments(departmentsList);
+  //   } catch (error) {
+  //     console.log(error);
+  //     Alert.alert("Erro", "Ocorreu um erro ao carregar os departamentos.");
+  //   }
+  // };
   const loadDepartments = async () => {
     try {
-      const keys = await AsyncStorage.getAllKeys();
-      const departmentKeys = keys.filter((key) =>
-        key.startsWith("department_")
-      );
-      const departmentsData = await AsyncStorage.multiGet(departmentKeys);
-      const departmentsList = departmentsData.map(([key, value]) =>
-        JSON.parse(value!)
-      );
+      const response = await axios.get("http://localhost:8080/api/departament");
+      if (response.status == 200) {
+        const departmentsList = response.data;
+        console.log(departmentsList);
 
-      setDepartments(departmentsList);
+        setDepartments(departmentsList);
+      }
     } catch (error) {
       console.log(error);
       Alert.alert("Erro", "Ocorreu um erro ao carregar os departamentos.");
@@ -51,14 +66,32 @@ const Departamentos = () => {
   };
 
   // Deleta o departamento
+  // const handleDelete = async () => {
+  //   if (!selectedDepartment) return;
+
+  //   try {
+  //     await AsyncStorage.removeItem(`department_${selectedDepartment.id}`);
+  //     setModalVisible(false);
+  //     loadDepartments();
+  //     Alert.alert("Sucesso", "Departamento deletado com sucesso!");
+  //   } catch (error) {
+  //     console.log(error);
+  //     Alert.alert("Erro", "Ocorreu um erro ao deletar o departamento.");
+  //   }
+  // };
   const handleDelete = async () => {
     if (!selectedDepartment) return;
 
     try {
-      await AsyncStorage.removeItem(`department_${selectedDepartment.id}`);
-      setModalVisible(false);
-      loadDepartments();
-      Alert.alert("Sucesso", "Departamento deletado com sucesso!");
+      const response = await axios.delete(`http://localhost:8080/api/departament/${selectedDepartment.id}`);
+      console.log(response.status);
+      
+      if(response.status === 204){
+
+        setModalVisible(false);
+        loadDepartments();
+        Alert.alert("Sucesso", "Departamento deletado com sucesso!");
+      }
     } catch (error) {
       console.log(error);
       Alert.alert("Erro", "Ocorreu um erro ao deletar o departamento.");
@@ -68,7 +101,7 @@ const Departamentos = () => {
   // Abre o modal de edição
   const handleEdit = (department: IDepartment) => {
     setSelectedDepartment(department);
-    setEditName(department.nome);
+    setEditName(department.name);
     setEditModalVisible(true);
   };
 
@@ -81,28 +114,29 @@ const Departamentos = () => {
 
     const updatedDepartment = {
       ...selectedDepartment,
-      nome: editName.trim(),
+      name: editName.trim(),
     };
 
     try {
-      await AsyncStorage.setItem(
-        `department_${updatedDepartment.id}`,
-        JSON.stringify(updatedDepartment)
+      const response =await axios.put(`http://localhost:8080/api/departament/${updatedDepartment.id}`,
+        updatedDepartment
       );
-      setEditModalVisible(false);
-      loadDepartments();
-      Alert.alert("Sucesso", "Departamento editado com sucesso!");
+      console.log( response.status)
+      if(response.status ===200){
+        setEditModalVisible(false);
+        loadDepartments();
+        Alert.alert("Sucesso", "Departamento editado com sucesso!");
+      }
     } catch (error) {
       console.log(error);
       Alert.alert("Erro", "Ocorreu um erro ao editar o departamento.");
     }
   };
 
- 
   // Navegação do botão adicionar
-  const handleNavigationCriarDep = () =>{
-    router.push("/screens/criarDep")
-  }
+  const handleNavigationCriarDep = () => {
+    router.push("/screens/criarDep");
+  };
 
   // Carrega os departamentos ao abrir a página
 
@@ -128,18 +162,14 @@ const Departamentos = () => {
         style={styles.logo}
       />
       <View style={styles.buttonContainer}>
-        <CreateDepButton
-          handleNavigation={()=>handleNavigationCriarDep()}
-        />
+        <CreateDepButton handleNavigation={() => handleNavigationCriarDep()} />
       </View>
       <Text style={styles.title}>Departamentos</Text>
 
-
       {/* Lista de departamentos */}
-      
 
       <FlatList
-        style={{width:375}}
+        style={{ width: 375 }}
         data={departments}
         keyExtractor={(item) => item.id}
         refreshControl={
@@ -147,30 +177,27 @@ const Departamentos = () => {
         }
         renderItem={({ item }) => (
           <Department
-            nome={item.nome}
+            nome={item.name}
             handleEdit={() => handleEdit(item)}
             handleDeleteConfirmation={() => handleDeleteConfirmation(item)}
           />
-          
         )}
       />
-      
 
       {/* Modal de Exlusão */}
       <ModalDelete
         modalVisible={modalVisible}
         setModalVisible={() => setModalVisible(false)}
         handleDelete={handleDelete}
-        modalText={`Tem certeza que deseja deletar o departamento "${selectedDepartment?.nome}"?`}
-
+        modalText={`Tem certeza que deseja deletar o departamento "${selectedDepartment?.name}"?`}
       />
 
-      {/* Modal de edição */}  
+      {/* Modal de edição */}
       <ModalEditDepartment
         editModalVisible={editModalVisible}
         editName={editName}
         setEditName={setEditName}
-        setEditModalVisible={()=> setEditModalVisible(false)}
+        setEditModalVisible={() => setEditModalVisible(false)}
         handleSaveEdit={handleSaveEdit}
       />
 
@@ -189,8 +216,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 20,
   },
-   buttonContainer: {
-    marginVertical: 10, 
+  buttonContainer: {
+    marginVertical: 10,
   },
   logo: {
     width: 150,
