@@ -1,93 +1,65 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView } from "react-native";
+import React, { useContext, useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  ScrollView,
+} from "react-native";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, { AxiosError } from "axios";
+import { AuthContext } from "@/context/AuthContext";
+import { ILogin } from "@/interface/ILogin";
 
 const validationSchema = Yup.object().shape({
-  matricula: Yup.string()
-    .trim()
-    .required("A matrícula é obrigatória.")
-    .max(12),
-  senha:Yup.string().required("Digite sua senha.")
+  matricula: Yup.string().trim().required("A matrícula é obrigatória.").max(12),
+  senha: Yup.string().required("Digite sua senha."),
 });
 
 const LoginScreen = () => {
+  const{login} = useContext(AuthContext)
 
-  const handleLogin = async ( values:{matricula:string, senha:string}) =>{
+  const handleLogin = (values: { matricula: string; senha: string }) => {
 
-    const login ={
-      username:values.matricula,
-      password: values.senha
-    }
-    { try {
-      const response = await axios.post('http://localhost:8080/api/login' ,login)
-
-      if(response.status === 200){
-
-          const token = response.data.token;
-          const user = response.data.user;
-          const authority = user.roles[0].authority;
-          
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          await AsyncStorage.setItem('auth_token', token);
-          
-          console.log('Login success:');
-          if (authority === 'ADMIN') {
-          router.replace({
-            pathname: '../(adminTabs)/feed' ,
-            params: { userData: JSON.stringify(user) } 
-          });
+    const data:ILogin = {
+      username: values.matricula,
+      password: values.senha,
+    };
+    login(data)
     
-          console.log( JSON.stringify(user))// para saber o q ta saindo, pretenção usar para montar o perfil
-        } else {
-          router.replace({
-            pathname: '../(userTabs)/feed',
-            params: { userData: JSON.stringify(user) } 
-          });
-    
-        }
-      }else{
-        //adicionar mensagem para usuario de requisicao invalida
-        console.log("deu erro")
-      }
-    
-    } catch (error) {
-      
-      console.error('Login failed:', AxiosError);
-    }}
-  }
+  };
 
   return (
-    
     <ScrollView contentContainerStyle={styles.scrollContainer}>
-
       <View style={styles.logoContainer}>
-        <Image source={require('../../assets/images/Fala_campus-logo.png')} style={styles.logo} />
+        <Image
+          source={require("../../assets/images/Fala_campus-logo.png")}
+          style={styles.logo}
+        />
       </View>
-      
-    
+
       <View style={styles.container}>
-        
-      
         {/* Formulário de Login */}
         <Formik
           initialValues={{
-            matricula:"",
-            senha:""}
-          }
+            matricula: "",
+            senha: "",
+          }}
           validationSchema={validationSchema}
-          onSubmit={(values) =>handleLogin(values)}
+          onSubmit={(values) => handleLogin(values)}
         >
           {({
-          handleChange,
-          handleSubmit,
-          values,
-          errors,
-          touched,
-          handleBlur,
+            handleChange,
+            handleSubmit,
+            values,
+            errors,
+            touched,
+            handleBlur,
           }) => (
             <>
               <View style={styles.formContainer}>
@@ -116,35 +88,29 @@ const LoginScreen = () => {
                 {touched.matricula && errors.senha && (
                   <Text style={{ color: "red" }}>{errors.senha}</Text>
                 )}
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.button}
                   onPress={() => handleSubmit()}
-                  >
+                >
                   <Text style={styles.buttonText}>Entrar</Text>
                 </TouchableOpacity>
               </View>
             </>
           )}
-
         </Formik>
-      
-   </View>
-  
-   </ScrollView>
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
- 
   scrollContainer: {
     flex: 1,
     backgroundColor: "#ECEEEC",
-   
   },
   container: {
     alignItems: "center",
     paddingVertical: 150,
-
   },
   logoContainer: {
     width: "100%",
@@ -152,8 +118,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 20,
     marginBottom: 40,
-    flexDirection: 'row',
-    
+    flexDirection: "row",
   },
   logo: {
     width: 150,

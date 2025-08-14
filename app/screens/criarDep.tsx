@@ -1,5 +1,5 @@
-import { router, useNavigation } from "expo-router";
-import React, { useState } from "react";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
@@ -13,8 +13,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IDepartment } from "@/interface/IDepartment";
 import * as Yup from "yup";
 import { Formik } from "formik";
-
-
+import axios from "axios";
+import { AuthContext } from "@/context/AuthContext";
 
 const validationSchema = Yup.object().shape({
   nome: Yup.string()
@@ -25,35 +25,32 @@ const validationSchema = Yup.object().shape({
 });
 
 const CadastroDepartamento = () => {
+  const {dataUser} = useContext(AuthContext)
 
-  const handleSave = async (values:{nome:string}, resetForm:() => void) => {
-
-    const newDepartment:IDepartment = {
-      id: Date.now().toString(),
-      nome: values.nome.trim(),
+  const handleSave = async(values: { nome: string }, resetForm: () => void) => {
+    const newDepartment = {
+      name: values.nome,
+      users: dataUser?.roles[0].id,
     };
-
     try {
-      await AsyncStorage.setItem(
-        `department_${newDepartment.id}`,
-        JSON.stringify(newDepartment)
-      );
-      Alert.alert("Sucesso", "Departamento cadastrado com sucesso!");
-      resetForm();
-      router.replace('/(tabs)/deps')
+      const response = await axios.post("http://localhost:8080/api/departament", newDepartment)
+      if(response.status === 201){
+        console.log(response);
+        resetForm();
+        router.replace("/(adminTabs)/deps");
+
+      }
     } catch (error) {
       console.log(error);
-      Alert.alert("Erro", "Ocorreu um erro ao salvar o departamento.");
     }
   };
 
   // Navega
   const handleCancel = () => {
-    router.replace('/(tabs)/deps')
+    router.replace("/(adminTabs)/deps");
   };
 
   return (
-   
     <View style={styles.container}>
       <Image
         source={require("../../assets/images/Fala_campus-logo.png")}
@@ -61,20 +58,20 @@ const CadastroDepartamento = () => {
       />
       <Text style={styles.title}>Cadastro de Departamento</Text>
       <Formik
-        initialValues={{nome:""}}
+        initialValues={{ nome: "" }}
         validationSchema={validationSchema}
-        onSubmit={(values,{resetForm})=> handleSave(values,resetForm)}
-    >
-      {({
-        handleChange,
-        handleSubmit,
-        values,
-        errors,
-        touched,
-        handleBlur,
-      }) =>  (
-        <>
-           <Text style={styles.label}>Nome: *</Text>
+        onSubmit={(values, { resetForm }) => handleSave(values, resetForm)}
+      >
+        {({
+          handleChange,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+          handleBlur,
+        }) => (
+          <>
+            <Text style={styles.label}>Nome: *</Text>
             <TextInput
               style={styles.input}
               placeholder="Digite o Nome do Departamento"
@@ -90,22 +87,26 @@ const CadastroDepartamento = () => {
             )}
 
             <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.saveButton} onPress={()=>handleSubmit()}>
+              <TouchableOpacity
+                style={styles.saveButton}
+                onPress={() => handleSubmit()}
+              >
                 <Text style={styles.buttonText}>Salvar</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={handleCancel}
+              >
                 <Text style={styles.buttonText}>Cancelar</Text>
               </TouchableOpacity>
             </View>
-        </>
-      )}
+          </>
+        )}
+      </Formik>
 
-    </Formik>
-  
       <Text style={styles.footer}>
         Projeto Fala Campus Mobile - IFPB - Guarabira 2025
       </Text>
-      
     </View>
   );
 };
@@ -147,14 +148,14 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   saveButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: "#4CAF50",
     width: 100,
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
   },
   cancelButton: {
-    backgroundColor: '#F44336',
+    backgroundColor: "#F44336",
     width: 100,
     padding: 10,
     borderRadius: 5,

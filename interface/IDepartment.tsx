@@ -1,12 +1,4 @@
 export interface IDepartment{
-    id: string;
-    nome: string;
+    name:string;
+    responsibleUsers: string[];
 }
-
-// Estrutura do backend
-// export interface IDepartment{
-//     id:number;
-//     name:string;
-//     acronymDepartment: string;
-//     responsibleUsers: string[];
-// }

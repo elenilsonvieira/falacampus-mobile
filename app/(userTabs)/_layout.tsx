@@ -68,13 +68,13 @@ export default function DrawerLayout() {
           drawerIcon: ({ color }) => <IconSymbol size={24} name="mycomments.fill" color={color} />,
         }}
       />
-      <Drawer.Screen
+      {/* <Drawer.Screen
         name="Respostas"
         component={RespostasScreen}
         options={{
           drawerIcon: ({ color }) => <IconSymbol size={24} name="reply.bubble.fill" color={color} />,
         }}
-      />
+      /> */}
       {/* <Drawer.Screen
         name="Departamentos"
         component={DepsScreen}
