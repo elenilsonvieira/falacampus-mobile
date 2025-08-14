@@ -7,12 +7,9 @@ import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 // Importação das telas
-import HomeScreen from '../index';
+
 import FeedbackScreen from '../(userTabs)/feedback';
 import ExploreScreen from '../(userTabs)/explore';
-import RespostasScreen from '../(userTabs)/respostas';
-import DepsScreen from '../(userTabs)/deps';
-import LoginScreen from '../screens/login';
 import UserScreen from '../(userTabs)/user';
 import FeedScreen from '../(userTabs)/feed';
 
@@ -33,13 +30,7 @@ export default function DrawerLayout() {
         },
       }}
     >
-      {/* <Drawer.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          drawerIcon: ({ color }) => <IconSymbol size={24} name="home.fill" color={color} />,
-        }}
-      /> */}
+
       <Drawer.Screen
         name="Feed"
         component={FeedScreen}
@@ -68,27 +59,6 @@ export default function DrawerLayout() {
           drawerIcon: ({ color }) => <IconSymbol size={24} name="mycomments.fill" color={color} />,
         }}
       />
-      {/* <Drawer.Screen
-        name="Respostas"
-        component={RespostasScreen}
-        options={{
-          drawerIcon: ({ color }) => <IconSymbol size={24} name="reply.bubble.fill" color={color} />,
-        }}
-      /> */}
-      {/* <Drawer.Screen
-        name="Departamentos"
-        component={DepsScreen}
-        options={{
-          drawerIcon: ({ color }) => <IconSymbol size={24} name="apartment.building.fill" color={color} />,
-        }}
-      /> */}
-      {/* <Drawer.Screen
-        name="Login"
-        component={LoginScreen}
-        options={{
-          drawerIcon: ({ color }) => <IconSymbol size={24} name="login.square.fill" color={color} />,
-        }}
-      /> */}
       
     </Drawer.Navigator>
   );

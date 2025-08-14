@@ -33,13 +33,7 @@ export default function DrawerLayout() {
         },
       }}
     >
-      {/* <Drawer.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          drawerIcon: ({ color }) => <IconSymbol size={24} name="home.fill" color={color} />,
-        }}
-      /> */}
+
       <Drawer.Screen
         name="Feed"
         component={FeedScreen}
@@ -90,13 +84,6 @@ export default function DrawerLayout() {
         }}
       />
       
-      {/* <Drawer.Screen
-        name="Login"
-        component={LoginScreen}
-        options={{
-          drawerIcon: ({ color }) => <IconSymbol size={24} name="login.square.fill" color={color} />,
-        }}
-      /> */}
 
     </Drawer.Navigator>
   );
