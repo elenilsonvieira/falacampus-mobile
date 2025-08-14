@@ -7,10 +7,13 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
+  Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { IComment } from '@/interface/IComment';
+import axios from 'axios';
+import { IUser } from '@/interface/IUser';
 
 const { width, height } = Dimensions.get('window');
 
@@ -18,26 +21,38 @@ export default function Respostas() {
   const [comments, setComments] = useState<IComment[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'todos' | 'respondidos' | 'nao_respondidos'>('todos');
+  const [users, setUsers] = useState<IUser[]>([]);
 
-  // Buscar as mensagens salvas no AsyncStorage ao carregar a página
   useEffect(() => {
-  const fetchComments = async () => {
-    try {
-      const existingComments = await AsyncStorage.getItem('comments');
-      if (existingComments) {
-        setComments(JSON.parse(existingComments));
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
+
+    const fetchComments = async () => {
+      try{
+        const[commentsRes, usersRes] = await Promise.all([
+              axios.get("http://localhost:8080/api/comment/all"),
+              axios.get("http://localhost:8080/api/user/all")
+            ])
+      
+            if (commentsRes.status === 200) {
+              setComments(commentsRes.data);
+            }
+
+            if (usersRes.status === 200){
+              setUsers(usersRes.data);
+            }
+          }catch (error) {
+            console.log(error); 
+            Alert.alert("Erro", "Ocorreu um erro ao carregar os dados.");
+          } finally {
+            setLoading(false);
+          }
+    };
+    fetchComments();
+  }, []);
+
+  const getAuthorName = (authorId?: number | null) => {
+    const user = users.find((u)=>u.id === authorId);    
+    return user;
   };
-
-  fetchComments();
-}, []);
-
-  const sortedComments = [...comments].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -72,29 +87,29 @@ export default function Respostas() {
   <Text style={{ textAlign: 'center', marginTop: 20 }}>Nenhuma mensagem encontrada.</Text>
 ) : (
   <View style={styles.card}>
-    {sortedComments // Ordena do mais recente para o mais antigo.
+    {comments 
         .filter((comment) => { //Filtra os comentarios.
-          if (filter === 'respondidos') return comment.status === 'Respondido';
-          if (filter === 'nao_respondidos') return comment.status !== 'Respondido';
+          if (filter === 'respondidos') return comment.statusComment === 'SOLVED';
+          if (filter === 'nao_respondidos') return comment.statusComment !== 'SOLVED';
           return true;
         })
         .map((comment) => (//Itera cada comentario e mostra na tela.
         <View key={comment.id} style={styles.messageCard}>
-          <Text style={styles.cardAuthor}>Autor: {comment.author}</Text>
+          <Text style={styles.cardAuthor}>Autor: {getAuthorName(comment.authorId)?.name}</Text>
           <Text style={styles.cardDate}>
-            Enviado em: {new Date(comment.date).toLocaleString('pt-BR')}
+            Enviado em: {comment.creationDate}
           </Text>
           <Text style={styles.cardMessage}>Mensagem: {comment.message}</Text>
           <View style={styles.cardFooter}>
             <Text
               style={[
                 styles.cardStatus,
-                comment.status === 'Respondido' ? styles.statusAnswered : styles.statusPending,
+                comment.statusComment === 'SOLVED' ? styles.statusAnswered : styles.statusPending,
               ]}
             >
-              {comment.status || 'Pendente'}
+              {comment.statusComment || 'NOT_SOLVED'}
             </Text>
-            {comment.status !== 'Respondido' && (
+            {comment.statusComment !== 'SOLVED' && (
               <TouchableOpacity
                 style={styles.replyButton}
                  onPress={() =>

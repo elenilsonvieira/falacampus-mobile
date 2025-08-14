@@ -9,10 +9,11 @@ import {
   Image,
   Alert,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IComment } from "@/interface/IComment";
 import * as Yup from "yup";
 import { Formik } from "formik";
+import axios from "axios";
+import { IUser } from "@/interface/IUser";
 
 
 
@@ -27,21 +28,23 @@ const validationSchema = Yup.object().shape({
 export default function ResponderMensagem() {
   const { commentId } = useLocalSearchParams<{ commentId: string }>();
   const [comment, setComment] = useState<IComment | null>(null);
+  const [users, setUser] = useState<IUser[]>([]);
 
   useEffect(() => {
     const fetchComment = async () => {
       try {
-        const stored = await AsyncStorage.getItem("comments");
-        if (stored) {
-          const comments: IComment[] = JSON.parse(stored);
-          const selected = comments.find((c) => c.id === commentId);
-          if (selected) {
-            setComment(selected);
-          } else {
-            Alert.alert("Erro", "Comentário não encontrado.");
-            router.replace("/(tabs)/respostas");
+        const[commentRes, userRes] = await Promise.all([
+              axios.get(`http://localhost:8080/api/comment/${commentId}`),
+              axios.get("http://localhost:8080/api/user/all")
+            ])
+        
+          if (commentRes.status === 200) {     
+            setComment(commentRes.data);
           }
-        }
+          if (userRes.status === 200){
+            setUser(userRes.data);
+          }  
+
       } catch (error) {
         console.log(error);
         Alert.alert("Erro", "Ocorreu um erro ao carregar a mensagem.");
@@ -54,17 +57,19 @@ export default function ResponderMensagem() {
   const handleSend = async (values:{resposta:string}) => {
 
     try {
-      const stored = await AsyncStorage.getItem("comments");
-      if (stored) {
-        let comments: IComment[] = JSON.parse(stored);
-        comments = comments.map((c) =>
-          c.id === commentId
-            ? { ...c, response: values.resposta, status: "Respondido" }
-            : c
-        );
-        await AsyncStorage.setItem("comments", JSON.stringify(comments));
-        Alert.alert("Sucesso", "Resposta enviada!");
-        router.replace("/(tabs)/respostas");
+      const newAnswer = {
+        message: values.resposta,
+        commentId: comment?.id,
+        authorId: comment?.authorId //Corrigir isso aqui, atualmente ta como se o proprio usuario respondesse o proprio comentario. O id que deve ser passado aqui é o ID do responsavel pelo Departamento, no caso quem estaria respondendo o comentario.
+      };
+
+      try {
+       const response = await axios.post("http://localhost:8080/api/answer", newAnswer)
+        if(response.status === 201){
+          router.replace("/(adminTabs)/respostas");
+        }
+      } catch (error) {
+        console.log(error);
       }
     } catch (error) {
       console.log(error);
@@ -72,8 +77,13 @@ export default function ResponderMensagem() {
     }
   };
 
+  const getAuthorName = (authorId?: number | null) => {
+    const user = users.find((u)=>u.id === authorId);    
+    return user;
+  };
+
   const handleCancel = () => {
-    router.replace("/(tabs)/respostas");
+    router.replace("/(adminTabs)/respostas");
   };
 
   return (
@@ -85,7 +95,7 @@ export default function ResponderMensagem() {
       <Text style={styles.title}>Responder Mensagem</Text>
       {comment ? (
         <>
-          <Text style={styles.label}>Autor: {comment.author}</Text>
+          <Text style={styles.label}>Autor: {getAuthorName(comment.authorId)?.name}</Text>
           <Text style={styles.label}>Mensagem:</Text>
           <Text style={styles.messageBox}>{comment.message}</Text>
           <Formik
