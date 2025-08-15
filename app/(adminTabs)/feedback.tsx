@@ -5,6 +5,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Yup from "yup";
 import { Formik } from "formik";
 import DropDownPicker from 'react-native-dropdown-picker';
+import axios from 'axios';
+import { IDepartment } from '@/interface/IDepartment';
 
 
 
@@ -75,18 +77,22 @@ const CommentRegistration = () => {
 
     const getDepartments = async () =>{
        try {
-      const keys = await AsyncStorage.getAllKeys();
-      const departmentKeys = keys.filter((key) => key.startsWith("department_"));
-      const departmentsData = await AsyncStorage.multiGet(departmentKeys);
-      const departmentsList = departmentsData.map(([key, value]) => JSON.parse(value!));
+    //   const keys = await AsyncStorage.getAllKeys();
+    //   const departmentKeys = keys.filter((key) => key.startsWith("department_"));
+    //   const departmentsData = await AsyncStorage.multiGet(departmentKeys);
+    //   const departmentsList = departmentsData.map(([key, value]) => JSON.parse(value!));
+        const response = await axios.get("http://localhost:8080/api/departament/all")
+        if( response.status === 200){
+            const departmentsList = response.data
 
-      //formato necessário para o DropDownPicker
-      const formattedList = departmentsList.map((item) => ({
-        label: item.nome, 
-        value: item.nome, 
-      }));
-
-      setDepartments(formattedList);
+            //formato necessário para o DropDownPicker
+            const formattedList = departmentsList.map((item:IDepartment) => ({
+                label: item.name, 
+                value: item.name, 
+            }));
+            
+            setDepartments(formattedList);
+        }
     } catch (error) {
       console.log(error);
     }
@@ -95,6 +101,7 @@ const CommentRegistration = () => {
     useEffect(()=>{
         getDepartments()
     },[])
+
     return (
         
         <Provider>
@@ -186,10 +193,10 @@ const CommentRegistration = () => {
                                 <Text style={{ color: "red" }}>{errors.message}</Text>
                             )}
 
-                            <Text style={styles.label}>Data: *</Text>
+                            {/* <Text style={styles.label}>Data: *</Text>
                             <View style={styles.input}>
                                 <Text>{currentDate}</Text>
-                            </View>
+                            </View> */}
 
                             <Text style={styles.label}>Autor do comentário: *</Text>
                             <TextInput
