@@ -30,15 +30,26 @@ const CadastroDepartamento = () => {
   const handleSave = async(values: { nome: string }, resetForm: () => void) => {
     const newDepartment = {
       name: values.nome,
-      users: dataUser?.roles[0].id,
     };
+    
     try {
       const response = await axios.post("http://localhost:8080/api/departament", newDepartment)
       if(response.status === 201){
-        console.log(response);
-        resetForm();
-        router.replace("/(adminTabs)/deps");
 
+        const departamentId = response.data.id;
+
+        const addResponsibleUsers={
+          id:departamentId,
+          name: values.nome,
+          responsibleUsers: [dataUser?.roles[0]?.id]
+        } 
+      
+        const data = await axios.put(`http://localhost:8080/api/departament/${departamentId}`,addResponsibleUsers ) // melhorar  depois
+        if (data.status == 200){ 
+          resetForm();
+          router.back();
+        }
+          
       }
     } catch (error) {
       console.log(error);
@@ -47,7 +58,7 @@ const CadastroDepartamento = () => {
 
   // Navega
   const handleCancel = () => {
-    router.replace("/(adminTabs)/deps");
+    router.back();
   };
 
   return (

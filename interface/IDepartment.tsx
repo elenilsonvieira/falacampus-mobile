@@ -1,5 +1,5 @@
 export interface IDepartment{
     id:string;
     name:string;
-    responsibleUsers: string[];
+    //responsibleUsers: string[];
 }

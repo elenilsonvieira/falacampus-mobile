@@ -140,15 +140,15 @@ const Departamentos = () => {
 
   // Carrega os departamentos ao abrir a página
 
-  useEffect(() => {
-    loadDepartments();
-  }, []);
+  // useEffect(() => {
+  //   loadDepartments();
+  // }, []);
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     loadDepartments();
-  //   }, [])
-  // );
+  useFocusEffect(
+    useCallback(() => {
+      loadDepartments();
+    }, [])
+  );
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -167,9 +167,10 @@ const Departamentos = () => {
       <Text style={styles.title}>Departamentos</Text>
 
       {/* Lista de departamentos */}
+      <View style={{ flex: 1, width: '100%',paddingBottom: 20}}>
 
       <FlatList
-        style={{ width: 375 }}
+        // style={{ width: 375 }}
         data={departments}
         keyExtractor={(item) => item.id}
         refreshControl={
@@ -183,6 +184,7 @@ const Departamentos = () => {
           />
         )}
       />
+      </View>
 
       {/* Modal de Exlusão */}
       <ModalDelete
