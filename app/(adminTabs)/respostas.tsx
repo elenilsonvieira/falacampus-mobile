@@ -17,6 +17,11 @@ import { IUser } from '@/interface/IUser';
 
 const { width, height } = Dimensions.get('window');
 
+const STATUS_LABEL: Record<'NOT_SOLVED' | 'SOLVED', string> = {
+  NOT_SOLVED: 'Pendente',
+  SOLVED: 'Resolvido',
+};
+
 export default function Respostas() {
   const [comments, setComments] = useState<IComment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -107,7 +112,7 @@ export default function Respostas() {
                 comment.statusComment === 'SOLVED' ? styles.statusAnswered : styles.statusPending,
               ]}
             >
-              {comment.statusComment || 'NOT_SOLVED'}
+              {STATUS_LABEL[(comment.statusComment ?? 'NOT_SOLVED') as keyof typeof STATUS_LABEL] ?? comment.statusComment}
             </Text>
             {comment.statusComment !== 'SOLVED' && (
               <TouchableOpacity
