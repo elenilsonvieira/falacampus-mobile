@@ -16,6 +16,16 @@ import { IDepartment } from "@/interface/IDepartment";
 
 const { width, height } = Dimensions.get('window');
 
+const COMMENT_TYPE_LABEL: Record<'REVIEW' | 'COMPLIMENT' | 'SUGGESTION', string> = {
+  REVIEW: 'Crítica',
+  COMPLIMENT: 'Elogio',
+  SUGGESTION: 'Sugestão',
+};
+
+const STATUS_LABEL: Record<'NOT_SOLVED' | 'SOLVED', string> = {
+  NOT_SOLVED: 'Pendente',
+  SOLVED: 'Resolvido',
+};
 
 export default function Feed() {
 
@@ -104,7 +114,12 @@ export default function Feed() {
                         <View key={comment.id} style={styles.messageCard}>
                             <Text><Text style={styles.labelBold}>Autor:</Text> <Text style={styles.value}>{getAuthorName(comment.authorId)?.name}</Text></Text>
                             <Text><Text style={styles.labelBold}>Título:</Text> <Text style={styles.value}>{comment.title}</Text></Text>
-                            <Text><Text style={styles.labelBold}>Tipo:</Text> <Text style={styles.value}>{comment.commentType}</Text></Text>
+                            <Text>
+                              <Text style={styles.labelBold}>Tipo:</Text>{' '}
+                              <Text style={styles.value}>
+                                {COMMENT_TYPE_LABEL[comment.commentType as keyof typeof COMMENT_TYPE_LABEL] ?? comment.commentType}
+                              </Text>
+                            </Text>
                             <Text><Text style={styles.labelBold}>Departamento:</Text> <Text style={styles.value}>{getDepartmentName(comment.departamentId)?.name}</Text></Text>
                             <Text style={styles.labelBold}>Mensagem:</Text>
                             <Text style={styles.messageBox}>{comment.message}</Text>
@@ -117,7 +132,7 @@ export default function Feed() {
                                     comment.statusComment === 'SOLVED' ? styles.statusAnswered : styles.statusPending,
                                   ]}
                                 >
-                                  {comment.statusComment || 'NOT_SOLVED'}
+                                  {STATUS_LABEL[(comment.statusComment ?? 'NOT_SOLVED') as keyof typeof STATUS_LABEL] ?? comment.statusComment}
                                 </Text>
 
                                 {comment.statusComment === 'SOLVED' && (
