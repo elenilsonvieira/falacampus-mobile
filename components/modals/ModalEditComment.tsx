@@ -85,7 +85,7 @@ export default function ModalEditDepartment({
                             value={values.comentario}
                             multiline={true}
                             onChangeText={(text) => {
-                                handleChange("cometario")(text);
+                                handleChange("comentario")(text);
                                 setEditComment(text);
                             }}
                             onBlur={handleBlur("cometario")}

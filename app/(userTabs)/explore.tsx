@@ -10,7 +10,8 @@ import {
   Keyboard,
   FlatList,
   RefreshControl,
-  Dimensions
+  Dimensions,
+  ScrollView
 } from "react-native";
 import { Provider, Menu, Button } from "react-native-paper";
 import { AntDesign } from "@expo/vector-icons";
@@ -183,6 +184,14 @@ const SearchComments = () => {
           source={require("../../assets/images/Fala_campus-logo.png")}
           style={styles.logo}
         />
+        <ScrollView 
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+
         <Formik
           initialValues={{
             title: "",
@@ -254,40 +263,14 @@ const SearchComments = () => {
         </Formik>
 
 
-        <ModalEditResponse
-          editModalVisible={editResponseModalVisible}
-          setEditModalVisible={() => setEditResponseModalVisible(false)}
-          editResponse={responseToEdit}
-          setEditResponse={setResponseToEdit}
-          handleSaveEdit={saveEditedResponse}
-        />
 
-        <ModalEditComment
-          editModalVisible={editModalVisible}
-          setEditModalVisible={() => setEditModalVisible(false)}
-          editTitulo={editedTitle}
-          setEditTitulo={setEditedTitle}
-          editComment={editedMessage}
-          setEditComment={setEditedMessage}
-          handleSaveEdit={saveEditedComment}
-        />
-
-        <ModalDelete
-          modalVisible={deleteModalVisible}
-          setModalVisible={() => setDeleteModalVisible(false)}
-          handleDelete={ handleDeleteAction}
-          modalText={modalText}
-        />
-
-
+      
         <View style={styles.responseCard}>
           <Text style={styles.responseTitle}>Comentários Enviados</Text>
           <FlatList
             data={comments}
             keyExtractor={(item) => item.id}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
+            scrollEnabled={false}
             renderItem={({ item }) => (
               <CommentComponent
                 item={item}
@@ -312,40 +295,73 @@ const SearchComments = () => {
           />
 
         </View>
+        </ScrollView>
+        
+          <ModalEditResponse
+            editModalVisible={editResponseModalVisible}
+            setEditModalVisible={() => setEditResponseModalVisible(false)}
+            editResponse={responseToEdit}
+            setEditResponse={setResponseToEdit}
+            handleSaveEdit={saveEditedResponse}
+          />
+
+          <ModalEditComment
+            editModalVisible={editModalVisible}
+            setEditModalVisible={() => setEditModalVisible(false)}
+            editTitulo={editedTitle}
+            setEditTitulo={setEditedTitle}
+            editComment={editedMessage}
+            setEditComment={setEditedMessage}
+            handleSaveEdit={saveEditedComment}
+          />
+
+          <ModalDelete
+            modalVisible={deleteModalVisible}
+            setModalVisible={() => setDeleteModalVisible(false)}
+            handleDelete={ handleDeleteAction}
+            modalText={modalText}
+          />
       </View>
+      
     </Provider>
   );
 };
 
 const styles = StyleSheet.create({
-  outerContainer: {
+ outerContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
     backgroundColor: '#F5F5F5',
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    paddingBottom: 30,
+    paddingHorizontal: 20,
   },
   logo: {
     width: 150,
     height: 50,
     resizeMode: 'contain',
-    marginBottom: 20,
+    marginVertical: 20,
+    alignSelf: 'center',
   },
   container: {
     width: '100%',
-    alignItems: 'center',
   },
   card: {
     backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
-    width: '90%',
+    width: '100%',
     elevation: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-    alignItems: 'center',
+    marginBottom: 20,
+  },
+  responseCard: {
+    width: '100%',
+    marginBottom: 30,
   },
   title: {
     fontSize: 20,
@@ -398,19 +414,6 @@ const styles = StyleSheet.create({
   buttonText: {
     fontWeight: 'bold',
     color: 'white',
-  },
-  responseCard: {
-    flex: 1,
-    marginTop: 20,
-    width: '90%',
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
   },
   responseTitle: {
     fontSize: 18,
