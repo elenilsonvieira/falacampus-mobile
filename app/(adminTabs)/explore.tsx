@@ -10,7 +10,8 @@ import {
   Keyboard,
   FlatList,
   RefreshControl,
-  Dimensions
+  Dimensions,
+  ScrollView
 } from "react-native";
 import { Provider, Menu, Button } from "react-native-paper";
 import { AntDesign } from "@expo/vector-icons";
@@ -279,7 +280,7 @@ const SearchComments = () => {
           modalText={modalText}
         />
 
-
+      
         <View style={styles.responseCard}>
           <Text style={styles.responseTitle}>Comentários Enviados</Text>
           <FlatList

@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
   ScrollView,
+  KeyboardAvoidingView,
 } from "react-native";
 import * as Yup from "yup";
 import { Formik } from "formik";
@@ -35,7 +36,12 @@ const LoginScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
+    <KeyboardAvoidingView>
+
+    <ScrollView 
+      contentContainerStyle={styles.scrollContainer}
+      keyboardShouldPersistTaps="handled"
+      >
       <View style={styles.logoContainer}>
         <Image
           source={require("../../assets/images/Fala_campus-logo.png")}
@@ -100,12 +106,13 @@ const LoginScreen = () => {
         </Formik>
       </View>
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: "#ECEEEC",
   },
   container: {

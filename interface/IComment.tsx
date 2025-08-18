@@ -12,7 +12,7 @@
 
 //Estrutura do backend
 export interface IComment {
-  id: number;
+  id: string;
   title: string;
   message: string;
   creationDate: string;

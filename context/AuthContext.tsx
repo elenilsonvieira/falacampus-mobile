@@ -2,7 +2,7 @@ import { ILogin } from "@/interface/ILogin";
 import { IUser } from "@/interface/IUser";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, { AxiosError } from "axios";
-import { router, useNavigation } from "expo-router";
+import { router } from "expo-router";
 import React, { createContext,  useState } from "react";
 
 

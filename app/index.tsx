@@ -20,8 +20,9 @@ export default function App() {
 
          <TouchableOpacity
             onPress={()=>router.push('/screens/login')}
+            style={styles.loginButton}
           >
-            <Text>Login</Text>
+            <Text style={styles.buttonText}>Login</Text>
     
           </TouchableOpacity>
       </View>
@@ -53,6 +54,9 @@ export default function App() {
           <Text style={styles.devsTitle}>Desenvolvedores:</Text>
           <Text style={styles.devsText}>• Marcelo Felipe da Silva</Text>
           <Text style={styles.devsText}>• Lívia Freitas de Lucena</Text>
+          <Text style={styles.devsText}>• Everaldo Daniel de Souza Filho</Text>
+          <Text style={styles.devsText}>• Guilherme Moraes </Text>
+          <Text style={styles.devsText}>• Jefferson Almir Ramos da Silva </Text>
         </View>
       </View>
     </ScrollView>
@@ -150,5 +154,20 @@ const styles = StyleSheet.create({
     color: '#fff', // Texto branco
     fontSize: 16,
     marginBottom: 2,
+  },
+  loginButton: {
+     backgroundColor: '#4CAF50', 
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    
   },
 });
