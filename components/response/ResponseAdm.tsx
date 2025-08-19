@@ -1,13 +1,15 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View,  Dimensions } from 'react-native'
-import { IComment } from '@/interface/IComment';
+
+import { IDialogue } from '@/interface/IDialogue';
+import { AuthContext } from '@/context/AuthContext';
 
 const { width, height } = Dimensions.get('window');
 
 export type ResposeAdmProps = {
 
-    item:IComment
-    handleEditResponse:(id:string) => void;
+    item:IDialogue
+    handleEditResponse:(id:string|null) => void;
     setDeleteModalVisible:(visible: boolean) => void;
     setModalText:(text:string) => void;
     setSelectedIten: (value: { action: string; item: string}) => void;
@@ -15,14 +17,19 @@ export type ResposeAdmProps = {
     
 
 export default function ResponseAdm ({ item, handleEditResponse,setSelectedIten,setModalText, setDeleteModalVisible   }: ResposeAdmProps){
- return(
+  const {dataUser} = useContext(AuthContext);
+
+  return(
     <View style={styles.responseContainer}>
         <Text style={styles.responseLabel}>Resposta da Administração:</Text>
-        <Text style={styles.responseText}>{item.response}</Text>
+        <Text style={styles.responseText}>{item.answerMessage}</Text>
+
+        {dataUser?.roles[0].authority==="ADMIN" &&(
+          
         <View style={styles.buttonContainer}>
             <TouchableOpacity
             style={[styles.editButton]}
-            onPress={() => handleEditResponse(item.id)}
+            onPress={() => handleEditResponse(item.answerId)}
             >
             <Text style={styles.editButtonText}>Editar</Text>
             </TouchableOpacity>
@@ -30,8 +37,8 @@ export default function ResponseAdm ({ item, handleEditResponse,setSelectedIten,
             style={[styles.deleteButton]}
             onPress={() => {
               setSelectedIten({
-                action: 'comment',
-                item: item.id,
+                action: 'response',
+                item: item.answerId,
               });
               setDeleteModalVisible(true);
               setModalText("Tem certeza que quer deletar o comentário");
@@ -40,6 +47,7 @@ export default function ResponseAdm ({ item, handleEditResponse,setSelectedIten,
             <Text style={styles.deleteButtonText}>Remover</Text>
             </TouchableOpacity>
         </View>
+        )}
     </View>
  )
 }
