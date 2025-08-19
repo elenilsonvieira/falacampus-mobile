@@ -1,13 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, Keyboard, ScrollView, TouchableWithoutFeedback } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, Keyboard, ScrollView } from 'react-native';
 import { Provider,} from 'react-native-paper';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Yup from "yup";
 import { Formik } from "formik";
 import DropDownPicker from 'react-native-dropdown-picker';
+import axios from 'axios';
+import { IDepartment } from '@/interface/IDepartment';
+import { AuthContext } from '@/context/AuthContext';
 
-
-
+const COMMENT_TYPE_MAP = {
+  Crítica: 'REVIEW',
+  Elogio: 'COMPLIMENT',
+  Sugestão: 'SUGGESTION',
+} as const;
 
 const validationSchema = Yup.object().shape({
     title: Yup.string()
@@ -22,16 +27,14 @@ const validationSchema = Yup.object().shape({
     department:Yup.string()
         .required("O Departamento é obrigatório."),
     commentType:Yup.string()
-        .required("O tipo de comentário é obrigatório."),
-    author:Yup.string()
-        .trim()
-        .min(10, "O nome tem que ter no mínimo 10 caracteres")
-        .required("O nome do autor é obrigatório.").max(50),
-
+        .required("O tipo de comentário é obrigatório.")
 });
 
 const CommentRegistration = () => {
+
     const [departments, setDepartments] = useState<{ label: string; value: string }[]> ([])
+    const [deptNameToId, setDeptNameToId] = useState<Record<string, number>>({});//Pegar o Id do departamento pelo Nome dele
+    const {dataUser} = useContext(AuthContext)
     const [openDepartment, setOpenDepartment] = useState(false);
     const [openCommentType, setOpenCommentType] = useState(false);
     const [commentTypeList, setCommentTypeList] = useState([
@@ -40,53 +43,105 @@ const CommentRegistration = () => {
         { label: "Sugestão", value: "Sugestão" }
     ]);
 
-
     // Data fixa para o dia atual
     const currentDate = new Date().toLocaleDateString('pt-BR');
 
-    const handleSave = async (values:{title:string, message:string, department:string, 
-        commentType:string, author:string}, resetForm:() => void) => {
+    // const handleSave = async (values:{title:string, message:string, department:string, 
+    //     commentType:string, author:string}, resetForm:() => void) => {
 
-        const newComment = {
-            id: Date.now().toString(),
-            title: values.title,
-            message: values.message ,
-            author: values.author,
-            department: values.department,
-            date: new Date().toISOString(), // Salva a data real do sistema
-            type: values.commentType,
-            status: 'Pendente'
-        };
+    //     const newComment = {
+    //         id: Date.now().toString(),
+    //         title: values.title,
+    //         message: values.message ,
+    //         author: values.author,
+    //         department: values.department,
+    //         date: new Date().toISOString(), // Salva a data real do sistema
+    //         type: values.commentType,
+    //         status: 'Pendente'
+    //     };
 
-        try {
-            const existingComments = await AsyncStorage.getItem('comments');
-            const comments = existingComments ? JSON.parse(existingComments) : [];
-            comments.push(newComment);
-            await AsyncStorage.setItem('comments', JSON.stringify(comments));
+    //     try {
+    //         const existingComments = await AsyncStorage.getItem('comments');
+    //         const comments = existingComments ? JSON.parse(existingComments) : [];
+    //         comments.push(newComment);
+    //         await AsyncStorage.setItem('comments', JSON.stringify(comments));
 
-            Alert.alert('Sucesso', 'Comentário cadastrado com sucesso!');
-            Keyboard.dismiss();
-            resetForm();
-        } catch (error) {
-            console.log(error);
-        }
+    //         Alert.alert('Sucesso', 'Comentário cadastrado com sucesso!');
+    //         Keyboard.dismiss();
+    //         resetForm();
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // };
+
+    const handleSave = async (values: {title: string, message: string, department: string,
+        commentType: string;}, resetForm: () => void ) => {
+            try {
+                //Verifica Id do usuario
+                if (!dataUser?.id) {
+                    Alert.alert('Erro', 'Usuário não autenticado.');
+                    return;
+                }
+
+                //pega o Id do departamento
+                const departamentId = deptNameToId[values.department];
+
+                if (!departamentId) {
+                    Alert.alert('Erro', 'Departamento inválido.');
+                    return;
+                }
+
+                const authorId = dataUser?.id;
+
+                const newComment = {
+                    title: values.title.trim(),
+                    message: values.message.trim(),
+                    commentType:
+                    COMMENT_TYPE_MAP[
+                        values.commentType as keyof typeof COMMENT_TYPE_MAP
+                    ],
+                    authorId, // vem do login
+                    departamentId // mapeado pelo nome
+                };
+
+                const res = await axios.post('http://localhost:8080/api/comment', newComment);
+
+                if (res.status === 201) {
+                    Alert.alert('Sucesso', 'Comentário cadastrado com sucesso!');
+                    Keyboard.dismiss();
+                    resetForm();
+                    setOpenDepartment(false);
+                    setOpenCommentType(false);
+                }
+
+            } catch (error: any) {
+                console.log(error?.response?.data || error?.message);
+                Alert.alert('Erro', 'Não foi possível salvar o comentário.');
+            }
     };
 
 
     const getDepartments = async () =>{
        try {
-      const keys = await AsyncStorage.getAllKeys();
-      const departmentKeys = keys.filter((key) => key.startsWith("department_"));
-      const departmentsData = await AsyncStorage.multiGet(departmentKeys);
-      const departmentsList = departmentsData.map(([key, value]) => JSON.parse(value!));
+    //   const keys = await AsyncStorage.getAllKeys();
+    //   const departmentKeys = keys.filter((key) => key.startsWith("department_"));
+    //   const departmentsData = await AsyncStorage.multiGet(departmentKeys);
+    //   const departmentsList = departmentsData.map(([key, value]) => JSON.parse(value!));
 
-      //formato necessário para o DropDownPicker
-      const formattedList = departmentsList.map((item) => ({
-        label: item.nome, 
-        value: item.nome, 
-      }));
+        const response = await axios.get("http://localhost:8080/api/departament/all")
 
-      setDepartments(formattedList);
+        if( response.status === 200){
+
+            const list: IDepartment[] = response.data;
+
+            setDepartments(list.map((d) => ({ label: d.name, value: d.name })));
+
+            const hashSet: Record<string, number> = {}; //Set de Id
+
+            list.forEach((d) => (hashSet[d.name] = Number(d.id)));
+
+            setDeptNameToId(hashSet);
+        }
     } catch (error) {
       console.log(error);
     }
@@ -95,161 +150,137 @@ const CommentRegistration = () => {
     useEffect(()=>{
         getDepartments()
     },[])
+
     return (
-        
         <Provider>
             <View style={styles.containerLogo}>
-
-                <Image source={require('../../assets/images/Fala_campus-logo.png')} style={styles.logo} />
+                <Image
+                source={require('../../assets/images/Fala_campus-logo.png')}
+                style={styles.logo}
+                />
             </View>
+
             <ScrollView>
+                <View style={styles.container}>
+                    <View style={styles.card}>
+                        <Text style={styles.title}>Cadastro de Comentário</Text>
 
-            <View style={styles.container}>
-
-                <View style={styles.card}>
-                    
-                    <Text style={styles.title}>Cadastro de Comentário</Text>
-                        
-                    <Formik
-                        initialValues={{
-                            title: "",
-                            message: "",
-                            department: "",
-                            commentType: "",
-                            author: "",
-                        }}
-                        validationSchema={validationSchema}
-                        onSubmit={(values, { resetForm }) => handleSave(values, resetForm)}
+                        <Formik
+                            initialValues={{
+                                title: '',
+                                message: '',
+                                department: '',
+                                commentType: '',
+                            }}
+                            validationSchema={validationSchema}
+                            onSubmit={(values, { resetForm }) => handleSave(values, resetForm)}
                         >
-                        {({
-                            handleChange,
-                            handleBlur,
-                            handleSubmit,
-                            setFieldValue,
-                            setFieldTouched,
-                            values,
-                            errors,
-                            touched,
-                            resetForm,
-                        }) => (
+                            {({
+                                handleChange,
+                                handleBlur,
+                                handleSubmit,
+                                setFieldValue,
+                                setFieldTouched,
+                                values,
+                                errors,
+                                touched,
+                                resetForm,
+                            }) => (
                             <>
-                           
-
-                            <Text style={styles.label}>Departamento: *</Text>
-                            <DropDownPicker
-                            
-                                open={openDepartment}
-                                value={values.department}
-                                items={departments}
-                                setOpen={setOpenDepartment} 
-                                setValue={(callback) => {
-                                    const newValue = callback(values.department);
-                                    setFieldValue("department", newValue);    
-                                }}
-                                setItems={setDepartments}
-                                placeholder="Selecione um departamento"
-                                onClose={() => setFieldTouched("department", false)}  
-                                style={[styles.input]}
-                                dropDownContainerStyle={{ borderColor: "#ccc"}}
-                                listMode="SCROLLVIEW"
-                                    
-                            />
-                            {touched.department && errors.department && (
-                                <Text style={{ color: "red" }}>{errors.department}</Text>
-                            )}
-                            
-                            
-                            <Text style={styles.label}>Título: *</Text>
-                            <TextInput
-                                style={styles.input}
-                                value={values.title}
-                                onChangeText={handleChange("title")}
-                                onBlur={handleBlur("title")}
-                                placeholder="Digite o título do comentário"
-                                placeholderTextColor="#333"
-                            />
-                            {touched.title && errors.title && (
-                                <Text style={{ color: "red" }}>{errors.title}</Text>
-                            )}
-
-                            <Text style={styles.label}>Mensagem: *</Text>
-                            <TextInput
-                                style={styles.input}
-                                value={values.message}
-                                onChangeText={handleChange("message")}
-                                onBlur={handleBlur("message")}
-                                placeholder="Digite a sugestão, crítica ou elogio"
-                                placeholderTextColor="#333"
-                                multiline
-                            />
-                            {touched.message && errors.message && (
-                                <Text style={{ color: "red" }}>{errors.message}</Text>
-                            )}
-
-                            <Text style={styles.label}>Data: *</Text>
-                            <View style={styles.input}>
-                                <Text>{currentDate}</Text>
-                            </View>
-
-                            <Text style={styles.label}>Autor do comentário: *</Text>
-                            <TextInput
-                                style={styles.input}
-                                value={values.author}
-                                onChangeText={handleChange("author")}
-                                onBlur={handleBlur("author")}
-                                placeholder="Digite seu nome"
-                                placeholderTextColor="#333"
-                            />
-                            {touched.author && errors.author && (
-                                <Text style={{ color: "red" }}>{errors.author}</Text>
-                            )}
-
-                           
-
-                            <View style={{ zIndex: openCommentType ? 3000 : 0 }}>
-
-                                <Text style={styles.label}>Tipo de Comentário: *</Text>
+                                <Text style={styles.label}>Departamento: *</Text>
                                 <DropDownPicker
-                                    open={openCommentType}
-                                    value={values.commentType}
-                                    items={commentTypeList}
-                                    setOpen={setOpenCommentType} 
-                                    setValue={(callback) => {
-                                        const newValue = callback(values.commentType);
-                                        setFieldValue("commentType", newValue);    
+                                    open={openDepartment}
+                                    value={values.department} // string (nome)
+                                    items={departments} // [{label: nome, value: nome}]
+                                    setOpen={setOpenDepartment}
+                                    setValue={(cb) => {
+                                        const newValue = cb(values.department);
+                                        setFieldValue('department', newValue);
                                     }}
-                                    setItems={setCommentTypeList}
-                                    placeholder="Selecione um comentário"
-                                    onClose={() => setFieldTouched("commentType", false)}    
-                                    style={[styles.input]}
-                                    dropDownContainerStyle={{ borderColor: "#ccc" }}
+                                    setItems={setDepartments}
+                                    placeholder="Selecione um departamento"
+                                    onClose={() => setFieldTouched('department', true)}
+                                    style={styles.input}
+                                    dropDownContainerStyle={{ borderColor: '#ccc' }}
                                     listMode="SCROLLVIEW"
                                 />
-                                {touched.commentType && errors.commentType && (
-                                    <Text style={{ color: "red" }}>{errors.commentType}</Text>
+                                {touched.department && errors.department && (
+                                    <Text style={styles.error}>{errors.department}</Text>
                                 )}
-                            </View>
 
+                                <Text style={styles.label}>Título: *</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    value={values.title}
+                                    onChangeText={handleChange('title')}
+                                    onBlur={handleBlur('title')}
+                                    placeholder="Digite o título do comentário"
+                                    placeholderTextColor="#333"
+                                />
+                                {touched.title && errors.title && (
+                                    <Text style={styles.error}>{errors.title}</Text>
+                                )}
 
-                            <View style={styles.buttonContainer}>
-                                <TouchableOpacity style={styles.saveButton} onPress={()=>handleSubmit()}>
-                                <Text style={styles.buttonText}>Salvar</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                style={styles.cancelButton}
-                                onPress={() => resetForm()}
-                                >
-                                <Text style={styles.buttonText}>Limpar</Text>
-                                </TouchableOpacity>
-                            </View>
+                                <Text style={styles.label}>Mensagem: *</Text>
+                                <TextInput
+                                    style={[styles.input, { minHeight: 80 }]}
+                                    value={values.message}
+                                    onChangeText={handleChange('message')}
+                                    onBlur={handleBlur('message')}
+                                    placeholder="Digite a sugestão, crítica ou elogio"
+                                    placeholderTextColor="#333"
+                                    multiline
+                                />
+                                {touched.message && errors.message && (
+                                    <Text style={styles.error}>{errors.message}</Text>
+                                )}
+
+                                <View style={{ zIndex: openCommentType ? 3000 : 0 }}>
+                                    <Text style={styles.label}>Tipo de Comentário: *</Text>
+                                    <DropDownPicker
+                                        open={openCommentType}
+                                        value={values.commentType}
+                                        items={commentTypeList}
+                                        setOpen={setOpenCommentType}
+                                        setValue={(cb) => {
+                                            const newValue = cb(values.commentType);
+                                            setFieldValue('commentType', newValue);
+                                        }}
+                                        setItems={setCommentTypeList}
+                                        placeholder="Selecione um comentário"
+                                        onClose={() => setFieldTouched('commentType', true)}
+                                        style={styles.input}
+                                        dropDownContainerStyle={{ borderColor: '#ccc' }}
+                                        listMode="SCROLLVIEW"
+                                    />
+                                    {touched.commentType && errors.commentType && (
+                                    <Text style={styles.error}>{errors.commentType}</Text>
+                                    )}
+                                </View>
+
+                                <View style={styles.buttonContainer}>
+                                    <TouchableOpacity
+                                        style={styles.saveButton}
+                                        onPress={() => handleSubmit()}
+                                        >
+                                        <Text style={styles.buttonText}>Salvar</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                        style={styles.cancelButton}
+                                        onPress={() => {
+                                            resetForm();
+                                            setOpenDepartment(false);
+                                            setOpenCommentType(false);
+                                        }}
+                                    >
+                                    <Text style={styles.buttonText}>Limpar</Text>
+                                    </TouchableOpacity>
+                                </View>
                             </>
                         )}
-                    </Formik>
-                    
-
-                    
+                        </Formik>
+                    </View>
                 </View>
-            </View>
             </ScrollView>
         </Provider>
     );
@@ -347,6 +378,9 @@ const styles = StyleSheet.create({
     buttonText: {
         color: 'white',
         fontWeight: 'bold',
+    },
+    error: {
+        color: 'red',
     }
 });
 
