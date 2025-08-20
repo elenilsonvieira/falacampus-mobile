@@ -43,7 +43,7 @@ export default function CommentComponent({
 
       {/* Botões principais */}
       <View style={styles.cardFooter}>
-        {!item.answerId && (
+        {item.statusComment =="NOT_SOLVED" && (
           <TouchableOpacity
             style={[styles.editButton]}
             onPress={() => handleEditComment(item)}
