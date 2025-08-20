@@ -19,7 +19,7 @@ const validationSchema = Yup.object().shape({
     .required("O nome do departamento é obrigatório."),
 });
 
-export default function ModalEditDepartment({editModalVisible,setEditModalVisible,editResponse,setEditResponse,handleSaveEdit }:ModalResponseProps){
+export default function ModalEditResponse({editModalVisible,setEditModalVisible,editResponse,setEditResponse,handleSaveEdit }:ModalResponseProps){
 
     return(
         <Modal
@@ -49,7 +49,7 @@ export default function ModalEditDepartment({editModalVisible,setEditModalVisibl
                             style={styles.input}
                             placeholder="Digite a resposta"
                             value={values.response}
-                           multiline={true}
+                            multiline={true}
                             onChangeText={(text) => {
                               handleChange("response")(text);
                               setEditResponse(text);

@@ -84,7 +84,7 @@ const Departamentos = () => {
 
     try {
       const response = await axios.delete(`http://localhost:8080/api/departament/${selectedDepartment.id}`);
-      console.log(response.status);
+      
       
       if(response.status === 204){
 

@@ -7,14 +7,14 @@ import {
   Dimensions,
 } from "react-native";
 import { IComment } from "@/interface/IComment";
-import { IDialogue } from "@/interface/IDialogue";
 import { AuthContext } from "@/context/AuthContext";
 const { width, height } = Dimensions.get("window");
 
 export type CommentProps = {
   children: React.ReactNode;
-  item: IDialogue;
-  handleEditComment: (id: string) => void;
+  item: IComment;
+  handleEditComment: (coment: IComment) => void;
+  setEditModalVisible:(visible: boolean) => void;
   setSelectedIten: (value: { action: string; item: string }) => void;
   setDeleteModalVisible: (visible: boolean) => void;
   setModalText: (text: string) => void;
@@ -23,6 +23,7 @@ export type CommentProps = {
 export default function CommentComponent({
   children,
   handleEditComment,
+  setEditModalVisible,
   setSelectedIten,
   item,
   setDeleteModalVisible,
@@ -36,16 +37,16 @@ export default function CommentComponent({
       <View style={styles.commentContent}>
         <Text style={styles.commentTitle}>{item.title}</Text>
         <Text style={styles.commentText}>{item.message}</Text>
-        <Text style={styles.commentStatus}>Autor: {item.author}</Text>
-        <Text style={styles.commentStatus}>Status: {item.status}</Text>
+        <Text style={styles.commentStatus}>Autor: {dataUser?.name}</Text>
+        <Text style={styles.commentStatus}>Status: {item.statusComment}</Text>
       </View>
 
       {/* Botões principais */}
-      {/* <View style={styles.cardFooter}>
-        {!item.answerMessage && (
+      <View style={styles.cardFooter}>
+        {!item.answerId && (
           <TouchableOpacity
             style={[styles.editButton]}
-            onPress={() => handleEditComment(item.id)}
+            onPress={() => handleEditComment(item)}
           >
             <Text style={styles.editButtonText}>Editar</Text>
           </TouchableOpacity>
@@ -63,16 +64,19 @@ export default function CommentComponent({
         >
           <Text style={styles.deleteButtonText}>Remover</Text>
         </TouchableOpacity>
-      </View> */}
+      </View>
 
-      
+{/*       
             {dataUser?.roles[0].authority!=="ADMIN" &&(
 
             <View style={styles.cardFooter}>
-                {!item.answerMessage && (
+                {!item.answerId && (
                 <TouchableOpacity
                     style={[styles.editButton]}
-                    onPress={() => handleEditComment(item.id)}
+                    onPress={() =>{
+                      handleEditComment(item)
+                      setEditModalVisible(true)
+                    } }
                 >
                     <Text style={styles.editButtonText}>Editar</Text>
                 </TouchableOpacity>
@@ -81,22 +85,22 @@ export default function CommentComponent({
                 style={[styles.deleteButton]}
                 onPress={() => {
                   setSelectedIten({
-                            action:'response',
+                            action:'comment',
                             item:item.id,
                   })
                   setDeleteModalVisible(true);
                   setModalText(
-                    "Tem certeza que quer deletar a resposta?"
+                    "Tem certeza que quer deletar a comentário?"
                   );
                 }}
                 >
                 <Text style={styles.deleteButtonText}>Remover</Text>
                 </TouchableOpacity>
             </View>
-            )}
+            )} */}
 
       {/* Resposta da administração */}
-      {item.answerMessage && children}
+      {item.answerId && children}
     </View>
   );
 }

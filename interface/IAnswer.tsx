@@ -1,5 +1,5 @@
 export interface IAnswer {
-  id: number;
+  id: string;
   message: string;
   commentId: number;
   creationDate: string;

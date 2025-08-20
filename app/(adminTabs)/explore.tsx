@@ -29,7 +29,8 @@ import ResponseAdm from "@/components/response/ResponseAdm";
 import CommentComponent from "@/components/comment/Comment";
 import axios from "axios";
 import { AuthContext } from "@/context/AuthContext";
-import { IDialogue } from "@/interface/IDialogue";
+import { ICommentWithAnswer } from "@/interface/ICommentWithAnswer";
+import { IAnswer } from "@/interface/IAnswer";
 
 const validationSchema = Yup.object().shape({
   title: Yup.string()
@@ -46,7 +47,11 @@ const SearchComments = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("Buscar por");
-  const [comments, setComments] = useState<IDialogue[]>([]);
+  const [selectedComment, setselectedComment] = useState<IComment>();
+  const [selectedAnswer, setSelectedAnswer] = useState<IAnswer>();
+
+  const [commentWithAnswer,setCommentWithAnswer] = useState<ICommentWithAnswer[]>([])
+ 
   const [refreshing, setRefreshing] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editedTitle, setEditedTitle] = useState("");
@@ -58,6 +63,7 @@ const SearchComments = () => {
   const [openCommentType, setOpenCommentType] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [modalText, setModalText] = useState("");
+
   const [selectedIten, setSelectedIten] = useState({});
 
   const [menuVisible, setMenuVisible] = useState(false);
@@ -70,49 +76,40 @@ const SearchComments = () => {
 
   // Carrega os comentários do AsyncStorage
   const loadComments = async () => {
-    const userId = dataUser?.id
-    try {
-      const responseComments = await axios.get(`http://localhost:8080/api/comment/byAuthor/${userId}`);
-      
-      if (responseComments.status === 200) {
-        
-        const commentData= responseComments.data
+    const userId = dataUser?.id;
 
-        const commentList = await Promise.all(
-          commentData.map(async (item:IComment) => {
+    try {
+      const responseComments = await axios.get<IComment[]>(`http://localhost:8080/api/comment/byAuthor/${userId}`);
+
+      if (responseComments.status === 200) {
+        const commentData = responseComments.data;
+
+        const commentList: ICommentWithAnswer[] = await Promise.all(
+          commentData.map(async (comment) => {
             try {
-              const responseAnswer = await axios.get(`http://localhost:8080/api/answer/byComment/${item.id}`);
-              const answer = responseAnswer.data; 
-              
-              return {
-                id: item.id,
-                title: item.title,
-                message: item.message,
-                author: dataUser?.name,
-                status: item.statusComment,
-                answerId: answer[0]?.id ?? null,          
-                answerMessage: answer[0]?.message, 
-              };
-            } catch (error) {
-              return {
-                id: item.id,
-                title: item.title,
-                message: item.message,
-                author: dataUser?.name,
-                status: item.statusComment,
-                answerId: null,
-                answerMessage: "",
-              };
+              const responseAnswer = await axios.get<IAnswer[]>(`http://localhost:8080/api/answer/byComment/${comment.id}`);
+              const answer = responseAnswer.data[0] ?? null;
+
+              return { comment, answer };
+            } catch {
+              return { comment, answer: null };
             }
           })
         );
 
-        setComments(commentList);
+      
+        const list = [...commentList].sort((a, b) => {
+          const idA = parseInt(a.comment.id);
+          const idB = parseInt(b.comment.id);
+          return idB - idA;
+        });
+        setCommentWithAnswer(list);
       }
     } catch (error) {
       Alert.alert("Erro", "Ocorreu um erro ao carregar os comentários.");
     }
   };
+
 
   // Função para pesquisar comentários
   const handleSearch = () => {
@@ -134,69 +131,127 @@ const SearchComments = () => {
     loadComments();
   }, []);
 
+
   const handleDeleteComment = async (id: string) => {
-    const updatedComments = comments.filter((comment) => comment.id !== id);
-    setComments(updatedComments);
-    await AsyncStorage.setItem("comments", JSON.stringify(updatedComments));
-  };
-
-  const handleEditComment = (id: string) => {
-    const comment = comments.find((c) => c.id === id);
-    if (comment) {
-      setCommentToEdit(comment);
-      setEditedMessage(comment.message);
-      setEditedTitle(comment.title);
-      setEditModalVisible(true);
+    try {
+      const response = await axios.delete(`http://localhost:8080/api/comment/${id}`);
+      if(response.status === 204){
+        const updatedComments = comments.filter((item)=> {
+          return item.id!== id
+        })
+        setComments(updatedComments);
+      }
+    } catch (error) {
+      console.log(error); 
     }
+    
   };
 
+  const handleEditComment = (comment: IComment) => {
+    setselectedComment(comment)
+    setEditedMessage(comment.message);
+    setEditedTitle(comment.title);
+    setEditModalVisible(true);
+    
+  };
+
+  
   const saveEditedComment = async () => {
-    if (!editedMessage.trim()) {
-      Alert.alert("Erro", "A mensagem não pode estar vazia.");
-      return;
+  try {
+    const id = selectedComment?.id;
+    const updatedCommentData = {
+        
+      title: editedTitle,
+      message: editedMessage,
+      commentType:selectedComment?.commentType ,
+		  authorId: selectedComment?.authorId,
+		  departamentId: selectedComment?.departamentId,
+		  answerId: selectedComment?.answerId
+   
+    };
+
+    const response = await axios.put(
+      `http://localhost:8080/api/comment/${id}`,
+      updatedCommentData
+    );
+    
+    if(response.status === 200){
+      
+      setEditModalVisible(false);
+      setCommentToEdit(null);
+      setEditedTitle("");
+      setEditedMessage("");
     }
 
-    const updatedComments = comments.map((comment) =>
-      comment.id === commentToEdit.id
-        ? { ...comment, message: editedMessage, title: editedTitle }
-        : comment
-    );
+  } catch (error) {
+    console.log(error); 
+    Alert.alert("Erro", "Não foi possível atualizar o comentário.");
+  }
+};
 
-    setComments(updatedComments);
-    await AsyncStorage.setItem("comments", JSON.stringify(updatedComments));
-    setEditModalVisible(false);
-    setCommentToEdit(null);
+
+  // const handleDeleteResponse = async (id: string) => {
+  //   try {
+  //     const response = await axios.delete(`http://localhost:8080/api/answer/${id}`);
+  //     console.log(response.status);
+      
+  //     if(response.status === 204){
+
+  //       const updatedComments = comments.map((comment) => {
+         
+  //         if (comment.answerId === id) {
+            
+  //           return {
+  //             ...comment,
+  //             answerId: null,
+  //             answerMessage: "",
+  //           };
+  //         }
+  //         return comment;
+  //       });
+  //       setComments(updatedComments);
+  //     }
+  //   } catch (error) {
+  //     console.log(error); 
+  //   }
+  // };
+
+   const handleEditResponse = (answer:IAnswer) => {
+  
+    setSelectedAnswer(answer)
+    setResponseToEdit(answer.message);
+    setEditResponseModalVisible(true);
+    
   };
 
-  const handleEditResponse = (id: string|null) => {
-    const comment = comments.find((c) => c.id === id);
-    if (comment && comment.response) {
-      setResponseToEdit(comment.response);
-      setCommentWithResponse(comment);
-      setEditResponseModalVisible(true);
-    }
-  };
-
-  const handleDeleteResponse = async (id: string) => {
-    const updatedComments = comments.map((comment) =>
-      comment.id === id ? { ...comment, response: "" } : comment
-    );
-    setComments(updatedComments);
-    await AsyncStorage.setItem("comments", JSON.stringify(updatedComments));
-  };
 
   const saveEditedResponse = async () => {
-    const updatedComments = comments.map((comment) =>
-      comment.id === commentWithResponse.id
-        ? { ...comment, response: responseToEdit }
-        : comment
-    );
+  try {
+    const id = selectedAnswer?.id
+    const updatedResponseData = {
+      message: responseToEdit,
+      commentId: selectedAnswer?.commentId,
+      authorId: selectedAnswer?.authorId,
+    };
 
-    setComments(updatedComments);
-    await AsyncStorage.setItem("comments", JSON.stringify(updatedComments));
-    setEditResponseModalVisible(false);
-    setCommentWithResponse(null);
-  };
+    // Usa o answerId correto
+    const response = await axios.put(
+      `http://localhost:8080/api/answer/${id}`,
+      updatedResponseData
+    );
+    
+    if(response.status === 200){
+
+      setEditResponseModalVisible(false);
+      setResponseToEdit("");
+    }
+
+  } catch (error) {
+    console.log(error); 
+    Alert.alert("Erro", "Não foi possível atualizar a resposta.");
+  }
+};
+
 
   // escolhe a funçao que vai deletar o objeto
   const handleDeleteAction = () => {
@@ -301,52 +356,52 @@ const SearchComments = () => {
           <View style={styles.responseCard}>
             <Text style={styles.responseTitle}>Comentários Enviados</Text>
             <FlatList
-              data={comments}
-              keyExtractor={(item) => item.id}
+              data={commentWithAnswer}
+              keyExtractor={(item) => item.comment.id}
               scrollEnabled={false}
               renderItem={({ item }) => (
                 <CommentComponent
-                  item={item}
+                  item={item.comment}
                   handleEditComment={handleEditComment}
                   setDeleteModalVisible={setDeleteModalVisible}
+                  setEditModalVisible={setEditModalVisible}
                   setModalText={setModalText}
                   setSelectedIten={setSelectedIten}
                 >
-                  <ResponseAdm
-                    item={item}
-                    handleEditResponse={handleEditResponse}
-                    setDeleteModalVisible={setDeleteModalVisible}
-                    setModalText={setModalText}
-                    setSelectedIten={setSelectedIten}
-                  />
+                  {item.answer && (
+                    <ResponseAdm
+                      item={item.answer}
+                      handleEditResponse={handleEditResponse}
+                      setEditModalVisible={setEditResponseModalVisible}
+                      setDeleteModalVisible={setDeleteModalVisible}
+                      setModalText={setModalText}
+                      setSelectedIten={setSelectedIten}
+                    />
+                  )}
+                  
                 </CommentComponent>
               )}
             />
           </View>
         </ScrollView>
 
-
-        {dataUser?.roles[0].authority==="ADMIN"?(
-          <>
-            <ModalEditResponse
-              editModalVisible={editResponseModalVisible}
-              setEditModalVisible={() => setEditResponseModalVisible(false)}
-              editResponse={responseToEdit}
-              setEditResponse={setResponseToEdit}
-              handleSaveEdit={saveEditedResponse}
-            />
-
-            <ModalDelete
+           <ModalDelete
               modalVisible={deleteModalVisible}
               setModalVisible={() => setDeleteModalVisible(false)}
               handleDelete={handleDeleteAction}
               modalText={modalText}
             />
+        
+        
+          <ModalEditResponse
+              editModalVisible={editResponseModalVisible}
+              setEditModalVisible={() => setEditResponseModalVisible(false)}
+              editResponse={responseToEdit}
+              setEditResponse={setResponseToEdit}
+              handleSaveEdit={saveEditedResponse}
+          />
           
-          </>
-          ): (
-          <>
-            <ModalEditComment
+          <ModalEditComment
             editModalVisible={editModalVisible}
             setEditModalVisible={() => setEditModalVisible(false)}
             editTitulo={editedTitle}
@@ -354,16 +409,8 @@ const SearchComments = () => {
             editComment={editedMessage}
             setEditComment={setEditedMessage}
             handleSaveEdit={saveEditedComment}
-            />
-
-            <ModalDelete
-              modalVisible={deleteModalVisible}
-              setModalVisible={() => setDeleteModalVisible(false)}
-              handleDelete={handleDeleteAction}
-              modalText={modalText}
-            />
-          </>
-        )}
+          />
+        
         
         
       </View>
