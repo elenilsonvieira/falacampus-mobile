@@ -175,6 +175,8 @@ const SearchComments = () => {
       updatedCommentData
     );
     
+  
+    
     if(response.status === 200){
       
       setEditModalVisible(false);
@@ -378,7 +380,7 @@ const SearchComments = () => {
                       setSelectedIten={setSelectedIten}
                     />
                   )}
-                  
+
                 </CommentComponent>
               )}
             />
