@@ -49,7 +49,6 @@ const SearchComments = () => {
   const [searchType, setSearchType] = useState("Buscar por");
   const [selectedComment, setselectedComment] = useState<IComment>();
   const [selectedAnswer, setSelectedAnswer] = useState<IAnswer>();
-
   const [commentWithAnswer,setCommentWithAnswer] = useState<ICommentWithAnswer[]>([])
  
   const [refreshing, setRefreshing] = useState(false);
@@ -59,12 +58,11 @@ const SearchComments = () => {
   const [editedMessage, setEditedMessage] = useState("");
   const [editResponseModalVisible, setEditResponseModalVisible] = useState(false);
   const [responseToEdit, setResponseToEdit] = useState("");
-  const [commentWithResponse, setCommentWithResponse] = useState(null);
   const [openCommentType, setOpenCommentType] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [modalText, setModalText] = useState("");
 
-  const [selectedIten, setSelectedIten] = useState({});
+  const [selectedIten, setSelectedIten] = useState("");
 
   const [menuVisible, setMenuVisible] = useState(false);
 
@@ -136,10 +134,8 @@ const SearchComments = () => {
     try {
       const response = await axios.delete(`http://localhost:8080/api/comment/${id}`);
       if(response.status === 204){
-        const updatedComments = comments.filter((item)=> {
-          return item.id!== id
-        })
-        setComments(updatedComments);
+       
+        Alert.alert("Sucesso", "Departamento deletado com sucesso!");
       }
     } catch (error) {
       console.log(error); 
@@ -174,8 +170,6 @@ const SearchComments = () => {
       `http://localhost:8080/api/comment/${id}`,
       updatedCommentData
     );
-    
-  
     
     if(response.status === 200){
       
@@ -236,7 +230,6 @@ const SearchComments = () => {
       authorId: selectedAnswer?.authorId,
     };
 
-    // Usa o answerId correto
     const response = await axios.put(
       `http://localhost:8080/api/answer/${id}`,
       updatedResponseData
@@ -255,16 +248,11 @@ const SearchComments = () => {
 };
 
 
-  // escolhe a funçao que vai deletar o objeto
+  // funçao que vai deletar o objeto
   const handleDeleteAction = () => {
     if (!selectedIten) return;
-
-    if (selectedIten.action === "comment") {
-      handleDeleteComment(selectedIten.item);
-    } else if (selectedIten.action === "response") {
-      handleDeleteResponse(selectedIten.item);
-    }
-
+    
+    handleDeleteComment(selectedIten);
     setDeleteModalVisible(false);
   };
 
@@ -377,7 +365,7 @@ const SearchComments = () => {
                       setEditModalVisible={setEditResponseModalVisible}
                       setDeleteModalVisible={setDeleteModalVisible}
                       setModalText={setModalText}
-                      setSelectedIten={setSelectedIten}
+                      // setSelectedIten={setSelectedIten}
                     />
                   )}
 

@@ -15,7 +15,7 @@ export type CommentProps = {
   item: IComment;
   handleEditComment: (coment: IComment) => void;
   setEditModalVisible:(visible: boolean) => void;
-  setSelectedIten: (value: { action: string; item: string }) => void;
+  setSelectedIten: ( item: string ) => void;
   setDeleteModalVisible: (visible: boolean) => void;
   setModalText: (text: string) => void;
 };
@@ -54,10 +54,7 @@ export default function CommentComponent({
         <TouchableOpacity
           style={[styles.deleteButton]}
           onPress={() => {
-            setSelectedIten({
-              action: "response",
-              item: item.id,
-            });
+            setSelectedIten(item.id);
             setDeleteModalVisible(true);
             setModalText("Tem certeza que quer deletar a resposta?");
           }}
@@ -66,38 +63,39 @@ export default function CommentComponent({
         </TouchableOpacity>
       </View>
 
-{/*       
-            {dataUser?.roles[0].authority!=="ADMIN" &&(
 
-            <View style={styles.cardFooter}>
-                {!item.answerId && (
-                <TouchableOpacity
-                    style={[styles.editButton]}
-                    onPress={() =>{
-                      handleEditComment(item)
-                      setEditModalVisible(true)
-                    } }
-                >
-                    <Text style={styles.editButtonText}>Editar</Text>
-                </TouchableOpacity>
-                )}
-                <TouchableOpacity
-                style={[styles.deleteButton]}
-                onPress={() => {
-                  setSelectedIten({
-                            action:'comment',
-                            item:item.id,
-                  })
-                  setDeleteModalVisible(true);
-                  setModalText(
-                    "Tem certeza que quer deletar a comentário?"
-                  );
-                }}
-                >
-                <Text style={styles.deleteButtonText}>Remover</Text>
-                </TouchableOpacity>
-            </View>
-            )} */}
+      {/* {dataUser?.roles[0].authority!=="ADMIN" &&(
+
+      <View style={styles.cardFooter}>
+          {item.statusComment =="NOT_SOLVED" && (
+
+            <>
+              <TouchableOpacity
+                  style={[styles.editButton]}
+                  onPress={() =>{
+                    handleEditComment(item)
+                    setEditModalVisible(true)
+                  } }
+              >
+                  <Text style={styles.editButtonText}>Editar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+              style={[styles.deleteButton]}
+              onPress={() => {
+                setSelectedIten(item.id);
+                setDeleteModalVisible(true);
+                setModalText(
+                  "Tem certeza que quer deletar a comentário?"
+                );
+              }}
+              >
+              <Text style={styles.deleteButtonText}>Remover</Text>
+              </TouchableOpacity>
+            </>
+          )}
+      </View>
+      )} */}
 
       {/* Resposta da administração */}
       {item.answerId && children}

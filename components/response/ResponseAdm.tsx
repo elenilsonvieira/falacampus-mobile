@@ -14,11 +14,11 @@ export type ResposeAdmProps = {
     setEditModalVisible:(visible: boolean) => void;
     setDeleteModalVisible:(visible: boolean) => void;
     setModalText:(text:string) => void;
-    setSelectedIten: (value: { action: string; item: string}) => void;
+    // setSelectedIten: ( item: string) => void;
 };  
     
 
-export default function ResponseAdm ({ item, handleEditResponse,setEditModalVisible,setSelectedIten,setModalText, setDeleteModalVisible   }: ResposeAdmProps){
+export default function ResponseAdm ({ item, handleEditResponse,setEditModalVisible,setModalText, setDeleteModalVisible   }: ResposeAdmProps){
   const {dataUser} = useContext(AuthContext);
 
   return(
