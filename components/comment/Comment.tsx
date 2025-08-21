@@ -42,7 +42,7 @@ export default function CommentComponent({
       </View>
 
       {/* Botões principais */}
-      <View style={styles.cardFooter}>
+      {/* <View style={styles.cardFooter}>
         {item.statusComment =="NOT_SOLVED" && (
           <TouchableOpacity
             style={[styles.editButton]}
@@ -61,10 +61,10 @@ export default function CommentComponent({
         >
           <Text style={styles.deleteButtonText}>Remover</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
 
-      {/* {dataUser?.roles[0].authority!=="ADMIN" &&(
+      {dataUser?.roles[0].authority!=="ADMIN" &&(
 
       <View style={styles.cardFooter}>
           {item.statusComment =="NOT_SOLVED" && (
@@ -95,7 +95,7 @@ export default function CommentComponent({
             </>
           )}
       </View>
-      )} */}
+      )}
 
       {/* Resposta da administração */}
       {item.answerId && children}
