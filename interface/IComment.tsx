@@ -9,7 +9,7 @@
 //   status?: string;
 //   response?: string;
 // }
-
+ import { StatusKey } from "@/constants/statusLabel";
 //Estrutura do backend
 export interface IComment {
   id: string;
@@ -17,7 +17,7 @@ export interface IComment {
   message: string;
   creationDate: string;
   commentType: string;
-  statusComment: string;
+  statusComment: StatusKey;
   authorId: number;
   departamentId: number;
   answerId?: number | null;

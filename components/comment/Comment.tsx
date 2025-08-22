@@ -9,6 +9,7 @@ import {
 import { IComment } from "@/interface/IComment";
 import { AuthContext } from "@/context/AuthContext";
 const { width, height } = Dimensions.get("window");
+import { getStatusLabel } from "@/constants/statusLabel";
 
 export type CommentProps = {
   children: React.ReactNode;
@@ -38,7 +39,7 @@ export default function CommentComponent({
         <Text style={styles.commentTitle}>{item.title}</Text>
         <Text style={styles.commentText}>{item.message}</Text>
         <Text style={styles.commentStatus}>Autor: {dataUser?.name}</Text>
-        <Text style={styles.commentStatus}>Status: {item.statusComment}</Text>
+        <Text style={styles.commentStatus}>Status: {getStatusLabel(item.statusComment)}</Text>
       </View>
 
       {/* Botões principais */}

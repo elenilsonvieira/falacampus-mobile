@@ -5,6 +5,7 @@ import { StyleSheet, Text, TouchableOpacity, View,  Dimensions } from 'react-nat
 import { AuthContext } from '@/context/AuthContext';
 import { IAnswer } from '@/interface/IAnswer';
 
+
 const { width, height } = Dimensions.get('window');
 
 export type ResposeAdmProps = {
