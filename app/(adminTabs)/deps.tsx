@@ -113,8 +113,9 @@ const Departamentos = () => {
     }
 
     const updatedDepartment = {
-      ...selectedDepartment,
+      id :selectedDepartment.id,
       name: editName.trim(),
+      
     };
 
     try {

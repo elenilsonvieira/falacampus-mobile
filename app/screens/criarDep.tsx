@@ -20,7 +20,7 @@ const validationSchema = Yup.object().shape({
   nome: Yup.string()
     .trim()
     .min(5, "O campo tem que ter no mínimo 5 caracteres")
-    .max(30)
+    .max(100)
     .required("O nome do departamento é obrigatório."),
 });
 
@@ -41,10 +41,13 @@ const CadastroDepartamento = () => {
         const addResponsibleUsers={
           id:departamentId,
           name: values.nome,
-          responsibleUsers: [dataUser?.roles[0]?.id]
+          responsibleUsers: [dataUser?.id]
         } 
-      
-        const data = await axios.put(`http://localhost:8080/api/departament/${departamentId}`,addResponsibleUsers ) // melhorar  depois
+        
+       console.log(addResponsibleUsers)
+        console.log(dataUser)
+
+        const data = await axios.put(`http://localhost:8080/api/departament/${departamentId}`, addResponsibleUsers ) // melhorar  depois
         if (data.status == 200){ 
           resetForm();
           router.back();

@@ -45,7 +45,7 @@ export default function AuthContextProvider({ children }: ChildrenProps) {
             pathname: "../(adminTabs)/feed",
             
           });
-
+          
         } else {
           router.replace({
             pathname: "../(userTabs)/feed",  

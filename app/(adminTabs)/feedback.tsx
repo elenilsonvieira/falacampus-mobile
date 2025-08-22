@@ -17,8 +17,8 @@ const COMMENT_TYPE_MAP = {
 const validationSchema = Yup.object().shape({
     title: Yup.string()
         .trim()
-        .max(50) 
-        .min(10, "O título tem que ter no mínimo 10 caracteres")
+        .max(30) 
+        .min(5, "O título tem que ter no mínimo 5 caracteres")
         .required("O título é obrigatório."),
     message: Yup.string()
         .trim()
