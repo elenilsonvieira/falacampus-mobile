@@ -79,9 +79,14 @@ const SearchComments = () => {
   // Carrega os comentários do AsyncStorage
   const loadComments = async () => {
     const userId = dataUser?.id;
-
+    const authority = dataUser?.roles[0].authority
     try {
-      const responseComments = await axios.get<IComment[]>(`http://localhost:8080/api/comment/all`);
+
+      const endpoint =  authority ==="ADMIN"
+        ? `http://localhost:8080/api/comment/all`
+        : `http://localhost:8080/api/comment/byAuthor/${userId}`
+
+      const responseComments = await axios.get<IComment[]>(endpoint);
 
       if (responseComments.status === 200) {
         const commentData = responseComments.data;
@@ -90,16 +95,21 @@ const SearchComments = () => {
           commentData.map(async (comment) => {
             try {
               const responseAnswer = await axios.get<IAnswer[]>(`http://localhost:8080/api/answer/byComment/${comment.id}`);
-              const answer = responseAnswer.data[0] ?? null;
 
-              return { comment, answer };
-            } catch {
+              if(responseAnswer.status === 200 && responseAnswer.data.length > 0){
+                const answer = responseAnswer.data[0];
+                return { comment, answer };
+              }else{
+                return { comment, answer: null };
+              }
+
+            } catch (error) {
+              console.log(`Erro ao buscar resposta para comentário ${comment.id}:`, error);
               return { comment, answer: null };
             }
           })
         );
 
-      
         const list = [...commentList].sort((a, b) => {
           const idA = parseInt(a.comment.id);
           const idB = parseInt(b.comment.id);
