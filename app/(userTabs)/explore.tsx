@@ -175,6 +175,14 @@ const SearchComments = () => {
     );
     
     if(response.status === 200){
+
+      const list = commentWithAnswer.map(item => 
+        item.comment.id === id 
+          ? { ...item, comment: { ...item.comment, title: editedTitle, message: editedMessage } }
+          : item
+      );
+
+      setCommentWithAnswer(list);
       
       setEditModalVisible(false);
       setCommentToEdit(null);
@@ -256,6 +264,8 @@ const SearchComments = () => {
     if (!selectedIten) return;
     
     handleDeleteComment(selectedIten);
+    const list = commentWithAnswer.filter((item)=> item.comment.id !== selectedIten)
+    setCommentWithAnswer(list)
     setDeleteModalVisible(false);
   };
 

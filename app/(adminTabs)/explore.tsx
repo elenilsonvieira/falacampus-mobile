@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import {
   View,
   Text,
@@ -31,6 +31,7 @@ import axios from "axios";
 import { AuthContext } from "@/context/AuthContext";
 import { ICommentWithAnswer } from "@/interface/ICommentWithAnswer";
 import { IAnswer } from "@/interface/IAnswer";
+import { useFocusEffect } from "expo-router";
 
 
 
@@ -133,6 +134,7 @@ const SearchComments = () => {
   }, []);
 
 
+
   const handleDeleteComment = async (id: string) => {
     try {
       const response = await axios.delete(`http://localhost:8080/api/comment/${id}`);
@@ -175,6 +177,14 @@ const SearchComments = () => {
     );
     
     if(response.status === 200){
+      // tirar depois do teste
+      const list = commentWithAnswer.map(item => 
+        item.comment.id === id 
+          ? { ...item, comment: { ...item.comment, title: editedTitle, message: editedMessage } }
+          : item
+      );
+
+      setCommentWithAnswer(list);
       
       setEditModalVisible(false);
       setCommentToEdit(null);
@@ -240,6 +250,13 @@ const SearchComments = () => {
     
     if(response.status === 200){
 
+      const list = commentWithAnswer.map((item) =>
+        item.answer && item.answer.id === id
+        ? { ...item, answer: { ...item.answer, message: responseToEdit } }
+        : item
+      )
+       setCommentWithAnswer(list);
+
       setEditResponseModalVisible(false);
       setResponseToEdit("");
     }
@@ -256,6 +273,8 @@ const SearchComments = () => {
     if (!selectedIten) return;
     
     handleDeleteComment(selectedIten);
+    const list = commentWithAnswer.filter((item)=> item.comment.id !== selectedIten)
+    setCommentWithAnswer(list)
     setDeleteModalVisible(false);
   };
 
