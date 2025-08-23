@@ -15,8 +15,8 @@ export type CommentProps = {
   children: React.ReactNode;
   item: IComment;
   handleEditComment: (coment: IComment) => void;
-  setEditModalVisible:(visible: boolean) => void;
-  setSelectedIten: ( item: string ) => void;
+  setEditModalVisible: (visible: boolean) => void;
+  setSelectedIten: (item: string) => void;
   setDeleteModalVisible: (visible: boolean) => void;
   setModalText: (text: string) => void;
 };
@@ -39,7 +39,9 @@ export default function CommentComponent({
         <Text style={styles.commentTitle}>{item.title}</Text>
         <Text style={styles.commentText}>{item.message}</Text>
         <Text style={styles.commentStatus}>Autor: {dataUser?.name}</Text>
-        <Text style={styles.commentStatus}>Status: {getStatusLabel(item.statusComment)}</Text>
+        <Text style={styles.commentStatus}>
+          Status: {getStatusLabel(item.statusComment)}
+        </Text>
       </View>
 
       {/* Botões principais */}
@@ -64,38 +66,33 @@ export default function CommentComponent({
         </TouchableOpacity>
       </View> */}
 
-
-      {dataUser?.roles[0].authority!=="ADMIN" &&(
-
-      <View style={styles.cardFooter}>
-          {item.statusComment =="NOT_SOLVED" && (
-
+      {dataUser?.roles[0].authority !== "ADMIN" && (
+        <View style={styles.cardFooter}>
+          {item.statusComment == "NOT_SOLVED" && (
             <>
               <TouchableOpacity
-                  style={[styles.editButton]}
-                  onPress={() =>{
-                    handleEditComment(item)
-                    setEditModalVisible(true)
-                  } }
+                style={[styles.editButton]}
+                onPress={() => {
+                  handleEditComment(item);
+                  setEditModalVisible(true);
+                }}
               >
-                  <Text style={styles.editButtonText}>Editar</Text>
+                <Text style={styles.editButtonText}>Editar</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-              style={[styles.deleteButton]}
-              onPress={() => {
-                setSelectedIten(item.id);
-                setDeleteModalVisible(true);
-                setModalText(
-                  "Tem certeza que quer deletar a comentário?"
-                );
-              }}
+                style={[styles.deleteButton]}
+                onPress={() => {
+                  setSelectedIten(item.id);
+                  setDeleteModalVisible(true);
+                  setModalText("Tem certeza que quer deletar a comentário?");
+                }}
               >
-              <Text style={styles.deleteButtonText}>Remover</Text>
+                <Text style={styles.deleteButtonText}>Remover</Text>
               </TouchableOpacity>
             </>
           )}
-      </View>
+        </View>
       )}
 
       {/* Resposta da administração */}

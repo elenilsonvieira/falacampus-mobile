@@ -80,7 +80,7 @@ const SearchComments = () => {
     const userId = dataUser?.id;
 
     try {
-      const responseComments = await axios.get<IComment[]>(`http://localhost:8080/api/comment/byAuthor/${userId}`);
+      const responseComments = await axios.get<IComment[]>(`http://localhost:8080/api/comment/all`);
 
       if (responseComments.status === 200) {
         const commentData = responseComments.data;

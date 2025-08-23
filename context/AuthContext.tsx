@@ -33,6 +33,7 @@ export default function AuthContextProvider({ children }: ChildrenProps) {
         const token = response.data.token;
         const user = response.data.user;
         const authority = user.roles[0].authority;
+        // const authority = "User"
         
         setDataUser(user)
 

@@ -5,7 +5,6 @@ import { StyleSheet, Text, TouchableOpacity, View,  Dimensions } from 'react-nat
 import { AuthContext } from '@/context/AuthContext';
 import { IAnswer } from '@/interface/IAnswer';
 
-
 const { width, height } = Dimensions.get('window');
 
 export type ResposeAdmProps = {
@@ -27,6 +26,20 @@ export default function ResponseAdm ({ item, handleEditResponse,setEditModalVisi
         <Text style={styles.responseLabel}>Resposta da Administração:</Text>
         <Text style={styles.responseText}>{item.message}</Text>
 
+        {/* {dataUser?.roles[0].authority==="ADMIN" &&(
+          
+        <View style={styles.buttonContainer}>
+            <TouchableOpacity
+            style={[styles.editButton]}
+            onPress={() =>{
+              handleEditResponse(item)
+              setEditModalVisible(true)
+            } }
+            >
+            <Text style={styles.editButtonText}>Editar</Text>
+            </TouchableOpacity>
+        </View>
+        )} */}
         {dataUser?.roles[0].authority==="ADMIN" &&(
           
         <View style={styles.buttonContainer}>
@@ -39,19 +52,6 @@ export default function ResponseAdm ({ item, handleEditResponse,setEditModalVisi
             >
             <Text style={styles.editButtonText}>Editar</Text>
             </TouchableOpacity>
-            {/* <TouchableOpacity
-            style={[styles.deleteButton]}
-            onPress={() => {
-              setSelectedIten({
-                action: 'response',
-                item: item.id,
-              });
-              setDeleteModalVisible(true);
-              setModalText("Tem certeza que quer deletar o resposta?");
-            }}
-            >
-            <Text style={styles.deleteButtonText}>Remover</Text>
-            </TouchableOpacity> */}
         </View>
         )}
     </View>
