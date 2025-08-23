@@ -146,10 +146,13 @@ const SearchComments = () => {
 
 
   const handleDeleteComment = async (id: string) => {
+
     try {
       const response = await axios.delete(`http://localhost:8080/api/comment/${id}`);
       if(response.status === 204){
-       
+        
+        const list = commentWithAnswer.filter((item)=> item.comment.id !== selectedIten)
+        setCommentWithAnswer(list)
         Alert.alert("Sucesso", "Departamento deletado com sucesso!");
       }
     } catch (error) {
@@ -187,7 +190,7 @@ const SearchComments = () => {
     );
     
     if(response.status === 200){
-      // tirar depois do teste
+     
       const list = commentWithAnswer.map(item => 
         item.comment.id === id 
           ? { ...item, comment: { ...item.comment, title: editedTitle, message: editedMessage } }
@@ -283,8 +286,6 @@ const SearchComments = () => {
     if (!selectedIten) return;
     
     handleDeleteComment(selectedIten);
-    const list = commentWithAnswer.filter((item)=> item.comment.id !== selectedIten)
-    setCommentWithAnswer(list)
     setDeleteModalVisible(false);
   };
 

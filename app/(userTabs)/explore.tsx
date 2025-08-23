@@ -149,7 +149,8 @@ const SearchComments = () => {
     try {
       const response = await axios.delete(`http://localhost:8080/api/comment/${id}`);
       if(response.status === 204){
-       
+        const list = commentWithAnswer.filter((item)=> item.comment.id !== selectedIten)
+        setCommentWithAnswer(list)
         Alert.alert("Sucesso", "Departamento deletado com sucesso!");
       }
     } catch (error) {
@@ -276,8 +277,7 @@ const SearchComments = () => {
     if (!selectedIten) return;
     
     handleDeleteComment(selectedIten);
-    const list = commentWithAnswer.filter((item)=> item.comment.id !== selectedIten)
-    setCommentWithAnswer(list)
+    
     setDeleteModalVisible(false);
   };
 
