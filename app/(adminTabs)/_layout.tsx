@@ -15,6 +15,7 @@ import DepsScreen from '../(adminTabs)/deps';
 import LogoutScreen from '../screens/logout';
 import UserScreen from '../(adminTabs)/user';
 import FeedScreen from '../(adminTabs)/feed';
+import ProfilePhotoScreen from '../screens/profile-photo';
 
 
 const Drawer = createDrawerNavigator();
@@ -83,7 +84,6 @@ export default function DrawerLayout() {
           drawerIcon: ({ color }) => <IconSymbol size={24} name="logout.square.fill" color={color}  />,
         }}
       />
-      
 
     </Drawer.Navigator>
   );
