@@ -1,9 +1,9 @@
 import React, { useContext, useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
-import { AuthContext } from '@/context/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function LogoutScreen() {
-  const {logout} = useContext(AuthContext)
+  const {logout} = useAuth()
   
 
   useEffect(() => {

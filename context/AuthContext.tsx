@@ -1,15 +1,17 @@
 import { ILogin } from "@/interface/ILogin";
 import { IUser } from "@/interface/IUser";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { router } from "expo-router";
 import React, { createContext,  useState } from "react";
+import { Alert } from "react-native";
 
 
 type AuthContextType = {
   dataUser?: IUser;
   login: (values: ILogin) => Promise<void>;
   logout: () => Promise<void>;
+  loading: boolean;
 };
 
 export const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -20,9 +22,10 @@ export type ChildrenProps = {
 
 export default function AuthContextProvider({ children }: ChildrenProps) {
   const [dataUser, setDataUser] = useState<IUser>()
+  const [loading, setLoading]= useState(false)
 
   const login = async(values:ILogin)=>{
-
+      setLoading(true);
       try {
       const response = await axios.post(
         "http://localhost:8080/api/login",
@@ -33,7 +36,6 @@ export default function AuthContextProvider({ children }: ChildrenProps) {
         const token = response.data.token;
         const user = response.data.user;
         const authority = user.roles[0].authority;
-        // const authority = "User"
         
         setDataUser(user)
 
@@ -52,13 +54,13 @@ export default function AuthContextProvider({ children }: ChildrenProps) {
             pathname: "../(userTabs)/feed",  
           });
         }
-      } else {
-        //adicionar mensagem para usuario de requisicao invalida
-        console.log("deu erro");
       }
     } catch (error) {
-      console.error("Login failed:", AxiosError);
+      Alert.alert('Erro de login', 'Verifique sua matrícula e senha.');
+      console.log("deu erro");
+      console.error("Login failed:", error);
     }
+    setLoading(false);
   }
 
   const logout = async()=>{
@@ -69,11 +71,11 @@ export default function AuthContextProvider({ children }: ChildrenProps) {
 
       if(response.status === 200){
         delete axios.defaults.headers.common['Authorization'];
-        await AsyncStorage.removeItem('userToken');
+        await AsyncStorage.removeItem("auth_token");
 
         setTimeout(() => {  
           router.replace("/")
-        }, 1000);
+        }, 500);
       }
       
     } catch (error) {
@@ -84,7 +86,7 @@ export default function AuthContextProvider({ children }: ChildrenProps) {
 
     
   return (
-    <AuthContext.Provider value={{dataUser,login,logout}}>
+    <AuthContext.Provider value={{dataUser,login,logout, loading}}>
       {children}
     </AuthContext.Provider>
   );

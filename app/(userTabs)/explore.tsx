@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect} from "react";
 import {
   View,
   Text,
@@ -14,8 +14,6 @@ import {
   ScrollView,
 } from "react-native";
 import { Provider, Menu, Button } from "react-native-paper";
-import { AntDesign } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -31,6 +29,7 @@ import axios from "axios";
 import { AuthContext } from "@/context/AuthContext";
 import { ICommentWithAnswer } from "@/interface/ICommentWithAnswer";
 import { IAnswer } from "@/interface/IAnswer";
+import { useAuth } from "@/hooks/useAuth";
 
 
 
@@ -46,7 +45,7 @@ const validationSchema = Yup.object().shape({
 });
 
 const SearchComments = () => {
-  const {dataUser} = useContext(AuthContext);
+  const {dataUser} = useAuth();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("Buscar por");

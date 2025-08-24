@@ -32,6 +32,7 @@ import { AuthContext } from "@/context/AuthContext";
 import { ICommentWithAnswer } from "@/interface/ICommentWithAnswer";
 import { IAnswer } from "@/interface/IAnswer";
 import { useFocusEffect } from "expo-router";
+import { useAuth } from "@/hooks/useAuth";
 
 
 
@@ -47,7 +48,7 @@ const validationSchema = Yup.object().shape({
 });
 
 const SearchComments = () => {
-  const {dataUser} = useContext(AuthContext);
+  const {dataUser} = useAuth();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("Buscar por");
