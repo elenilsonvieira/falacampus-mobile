@@ -137,19 +137,18 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   editIcon: {
-  position: 'absolute',
-  top: 40,
-  right: 20,
-  backgroundColor: '#fff',         // fundo branco
-  padding: 12,
-  borderRadius: 40,
-  elevation: 5,                     // sombra no Android
-  shadowColor: '#000',              // sombra no iOS/Web
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.3,
-  shadowRadius: 3,
-},
-
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    backgroundColor: '#fff',         // fundo branco
+    padding: 12,
+    borderRadius: 40,
+    elevation: 5,                     // sombra no Android
+    shadowColor: '#000',              // sombra no iOS/Web
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.6)',

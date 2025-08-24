@@ -14,7 +14,7 @@ const User = () => {
     const router = useRouter();
     const { dataUser } = useContext(AuthContext);
     const [photo, setPhoto] = useState(DEFAULT_AVATAR);
-    const [departments, setDepartments] = useState<IDepartment[]>([]);
+    const [department, setDepartment] = useState<IDepartment>();
 
     useFocusEffect(
 
@@ -34,10 +34,10 @@ const User = () => {
 
         const fetchUser = async () => {
 
-            const departmentsRes = await axios.get("http://localhost:8080/api/departament/all");
+            const departmentRes = await axios.get(`http://localhost:8080/api/departament/${dataUser?.departamentId}`);
             try {
-                if(departmentsRes.status == 200){
-                    setDepartments(departmentsRes.data);
+                if(departmentRes.status == 200){
+                    setDepartment(departmentRes.data);
                 }
             } catch (error) {
                 console.log(error);
@@ -48,11 +48,6 @@ const User = () => {
 
         fetchUser();
     }, [])
-
-    const getDepartmentName = (departamentId?: number | null) => {
-        const departament = departments.find((d)=> Number(d.id) === departamentId);
-        return departament;
-    }; 
 
     return (
       <View style={styles.container}>
@@ -65,8 +60,7 @@ const User = () => {
         </View>
 
         <Text style={styles.name}>{dataUser?.name}</Text>
-        <Text style={styles.email}>{dataUser?.email}</Text>
-        <Text style={styles.department}>{getDepartmentName(dataUser?.departamentId)?.name}</Text>
+        <Text style={styles.department}>{department?.name}</Text>
       </View>
     );
 
@@ -130,7 +124,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-
-
 
 export default User;
