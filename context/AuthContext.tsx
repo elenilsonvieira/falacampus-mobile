@@ -3,7 +3,7 @@ import { IUser } from "@/interface/IUser";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { router } from "expo-router";
-import React, { createContext,  useState } from "react";
+import React, { createContext,  useEffect,  useState } from "react";
 import { Alert } from "react-native";
 
 
@@ -84,6 +84,43 @@ export default function AuthContextProvider({ children }: ChildrenProps) {
     
   }
 
+  const validateSession = async ()=>{
+    
+    try {
+      const token =  await AsyncStorage.getItem('auth_token');
+      
+      const tokenVerific = {
+        token: token
+      }
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      const response = await axios.post('http://localhost:8080/api/isValidToken',tokenVerific );
+      
+      if(response.status === 200){
+        const user = response.data.user;
+        const authority = user.roles[0].authority;
+        setDataUser(user)
+        if (authority === "ADMIN") {
+          router.replace({
+            pathname: "../(adminTabs)/feed",
+            
+          });
+          
+        } else {
+          router.replace({
+            pathname: "../(userTabs)/feed",  
+          });
+        }
+      }
+    } catch (error) {
+      await AsyncStorage.removeItem("auth_token");
+      delete axios.defaults.headers.common["Authorization"];
+      Alert.alert("Sessão expirada", "Faça o login novamente.");
+      router.replace("/");
+    }
+  }
+  useEffect(() =>{
+    validateSession()
+  },[])
     
   return (
     <AuthContext.Provider value={{dataUser,login,logout, loading}}>
