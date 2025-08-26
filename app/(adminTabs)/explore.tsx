@@ -31,7 +31,6 @@ import axios from "axios";
 import { AuthContext } from "@/context/AuthContext";
 import { ICommentWithAnswer } from "@/interface/ICommentWithAnswer";
 import { IAnswer } from "@/interface/IAnswer";
-import { useFocusEffect } from "expo-router";
 
 
 
@@ -39,12 +38,10 @@ import { useFocusEffect } from "expo-router";
 const validationSchema = Yup.object().shape({
   title: Yup.string()
     .trim()
-    .max(50)
-    .min(10, "O título tem que ter no mínimo 10 caracteres")
-    .required("O título é obrigatório."),
-
-  commentType: Yup.string().required("O tipo de comentário é obrigatório."),
-});
+    .max(50),
+    
+  commentType: Yup.string(),
+  });
 
 const SearchComments = () => {
   const {dataUser} = useContext(AuthContext);
@@ -53,7 +50,8 @@ const SearchComments = () => {
   const [searchType, setSearchType] = useState("Buscar por");
   const [selectedComment, setselectedComment] = useState<IComment>();
   const [selectedAnswer, setSelectedAnswer] = useState<IAnswer>();
-  const [commentWithAnswer,setCommentWithAnswer] = useState<ICommentWithAnswer[]>([])
+  const [commentWithAnswer,setCommentWithAnswer] = useState<ICommentWithAnswer[]>([]);
+  const [filteredComments, setFilteredComments] = useState<ICommentWithAnswer[]>([]);
  
   const [refreshing, setRefreshing] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -71,6 +69,7 @@ const SearchComments = () => {
   const [menuVisible, setMenuVisible] = useState(false);
 
   const [commentTypeList, setCommentTypeList] = useState([
+    { label: "Todos os tipos", value: "" },
     { label: "Crítica", value: "Crítica" },
     { label: "Elogio", value: "Elogio" },
     { label: "Sugestão", value: "Sugestão" },
@@ -122,6 +121,39 @@ const SearchComments = () => {
     }
   };
 
+  const handleFilterComments = (values) => {
+    const { title, commentType } = values;
+
+    const normalizedType = commentType.trim().toLowerCase();
+    const normalizedTitle = title.trim().toLowerCase();
+
+    let filtered = commentWithAnswer;
+
+    // Filter by type if it's not empty
+    if (normalizedType !== "") {
+      filtered = filtered.filter(item =>
+        item.comment.commentType?.trim().toLowerCase() === normalizedType
+      );
+    }
+
+    // Filter by title
+    if (normalizedTitle !== "") {
+      const keywords = normalizedTitle.split(/\s+/).filter(k => k.length > 0);
+
+      filtered = filtered.filter(item => {
+        const text = (item.comment.title + " " + item.comment.message).toLowerCase();
+        return keywords.every(word => text.includes(word));
+      });
+    }
+
+    if (filtered.length === 0) {
+      Alert.alert("Nenhum resultado", "Nenhum comentário corresponde aos critérios.");
+    } else {
+      Alert.alert("Pesquisa concluída", `Foram encontrados ${filtered.length} comentários.`);
+    }
+
+    setFilteredComments(filtered);
+  };
 
   // Função para pesquisar comentários
   const handleSearch = () => {
@@ -309,7 +341,7 @@ const SearchComments = () => {
               commentType: "",
             }}
             validationSchema={validationSchema}
-            onSubmit={() => handleSearch()}
+            onSubmit={handleFilterComments}
           >
             {({
               handleChange,
@@ -379,7 +411,7 @@ const SearchComments = () => {
           <View style={styles.responseCard}>
             <Text style={styles.responseTitle}>Comentários Enviados</Text>
             <FlatList
-              data={commentWithAnswer}
+              data={filteredComments}
               keyExtractor={(item) => item.comment.id}
               scrollEnabled={false}
               renderItem={({ item }) => (
