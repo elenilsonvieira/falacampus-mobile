@@ -16,6 +16,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, { AxiosError } from "axios";
 import { AuthContext } from "@/context/AuthContext";
 import { ILogin } from "@/interface/ILogin";
+import { useAuth } from "@/hooks/useAuth";
+import { ActivityIndicator } from "react-native-paper";
 
 const validationSchema = Yup.object().shape({
   matricula: Yup.string().trim().required("A matrícula é obrigatória.").max(12),
@@ -23,7 +25,9 @@ const validationSchema = Yup.object().shape({
 });
 
 const LoginScreen = () => {
-  const{login} = useContext(AuthContext)
+
+  const{login, loading} = useAuth()
+  
 
   const handleLogin = (values: { matricula: string; senha: string }) => {
 
@@ -31,6 +35,7 @@ const LoginScreen = () => {
       username: values.matricula,
       password: values.senha,
     };
+
     login(data)
     
   };
@@ -97,8 +102,12 @@ const LoginScreen = () => {
                 <TouchableOpacity
                   style={styles.button}
                   onPress={() => handleSubmit()}
+                  disabled={loading}
                 >
-                  <Text style={styles.buttonText}>Entrar</Text>
+        
+                  <Text style={styles.buttonText}>
+                    {loading?"Carregando...": "Entrar"}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </>

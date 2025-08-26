@@ -15,6 +15,7 @@ import * as Yup from "yup";
 import { Formik } from "formik";
 import axios from "axios";
 import { AuthContext } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 
 const validationSchema = Yup.object().shape({
   nome: Yup.string()
@@ -25,7 +26,7 @@ const validationSchema = Yup.object().shape({
 });
 
 const CadastroDepartamento = () => {
-  const {dataUser} = useContext(AuthContext)
+  const {dataUser} = useAuth();
 
   const handleSave = async(values: { nome: string }, resetForm: () => void) => {
     const newDepartment = {
