@@ -57,7 +57,6 @@ export default function AuthContextProvider({ children }: ChildrenProps) {
       }
     } catch (error) {
       Alert.alert('Erro de login', 'Verifique sua matrícula e senha.');
-      console.log("deu erro");
       console.error("Login failed:", error);
     }
     setLoading(false);
@@ -86,9 +85,13 @@ export default function AuthContextProvider({ children }: ChildrenProps) {
 
   const validateSession = async ()=>{
     
+    const token =  await AsyncStorage.getItem('auth_token');
+    
+    if(!token){
+      return;
+    }
     try {
-      const token =  await AsyncStorage.getItem('auth_token');
-      
+
       const tokenVerific = {
         token: token
       }
@@ -110,11 +113,17 @@ export default function AuthContextProvider({ children }: ChildrenProps) {
             pathname: "../(userTabs)/feed",  
           });
         }
+
+      }else{
+        await AsyncStorage.removeItem("auth_token");
+        delete axios.defaults.headers.common["Authorization"];
+        Alert.alert("Sessão expirada", "Faça o login novamente.");
+        router.replace("/")
       }
     } catch (error) {
+      console.error("Erro na validação do token:", error);
       await AsyncStorage.removeItem("auth_token");
       delete axios.defaults.headers.common["Authorization"];
-      Alert.alert("Sessão expirada", "Faça o login novamente.");
       router.replace("/");
     }
   }
