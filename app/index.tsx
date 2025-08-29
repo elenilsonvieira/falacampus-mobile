@@ -55,7 +55,7 @@ export default function App() {
           <Text style={styles.devsText}>• Marcelo Felipe da Silva</Text>
           <Text style={styles.devsText}>• Lívia Freitas de Lucena</Text>
           <Text style={styles.devsText}>• Everaldo Daniel de Sousa Filho</Text>
-          <Text style={styles.devsText}>• Guilherme Moraes </Text>
+          <Text style={styles.devsText}>• Guilherme Moraes de Lira </Text>
           <Text style={styles.devsText}>• Jefferson Almir Ramos da Silva </Text>
         </View>
       </View>
