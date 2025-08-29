@@ -88,6 +88,7 @@ const SearchComments = () => {
 
       if (responseComments.status === 200) {
         const commentData = responseComments.data;
+        
 
         const commentList: ICommentWithAnswer[] = await Promise.all(
           commentData.map(async (comment) => {

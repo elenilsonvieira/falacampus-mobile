@@ -45,9 +45,6 @@ const CadastroDepartamento = () => {
           responsibleUsers: [dataUser?.id]
         } 
         
-       console.log(addResponsibleUsers)
-        console.log(dataUser)
-
         const data = await axios.put(`http://localhost:8080/api/departament/${departamentId}`, addResponsibleUsers ) // melhorar  depois
         if (data.status == 200){ 
           resetForm();
