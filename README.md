@@ -67,10 +67,10 @@ Se quiser contribuir para o projeto, siga os passos:
 5. **Abra um Pull Request no GitHub**  
 
 ## 🛠️ Melhorias Futuras  
-- 📌 Implementação de um painel do usuário 
-- 📌 Melhorias na interface e experiência do usuário  
-- 📌 Sistema de deletar e editar clicando no departamento
-- 📌 Integração com e-mails institucionais para resposta direta  
+- 📌 Melhorias na interface e experiência do usuário;  
+- 📌 Criação de área de notificação;
+- 📌 Adicionar nos departamento um campo para a escolha do responsável;
+- 📌 Lógica para definição de tempo para editar comentário e reposta.
 
 
 ---
