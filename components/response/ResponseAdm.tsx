@@ -26,20 +26,7 @@ export default function ResponseAdm ({ item, handleEditResponse,setEditModalVisi
         <Text style={styles.responseLabel}>Resposta da Administração:</Text>
         <Text style={styles.responseText}>{item.message}</Text>
 
-        {/* {dataUser?.roles[0].authority==="ADMIN" &&(
-          
-        <View style={styles.buttonContainer}>
-            <TouchableOpacity
-            style={[styles.editButton]}
-            onPress={() =>{
-              handleEditResponse(item)
-              setEditModalVisible(true)
-            } }
-            >
-            <Text style={styles.editButtonText}>Editar</Text>
-            </TouchableOpacity>
-        </View>
-        )} */}
+        
         {dataUser?.roles[0].authority==="ADMIN" &&(
           
         <View style={styles.buttonContainer}>

@@ -45,26 +45,7 @@ export default function CommentComponent({
       </View>
 
       {/* Botões principais */}
-      {/* <View style={styles.cardFooter}>
-        {item.statusComment =="NOT_SOLVED" && (
-          <TouchableOpacity
-            style={[styles.editButton]}
-            onPress={() => handleEditComment(item)}
-          >
-            <Text style={styles.editButtonText}>Editar</Text>
-          </TouchableOpacity>
-        )}
-        <TouchableOpacity
-          style={[styles.deleteButton]}
-          onPress={() => {
-            setSelectedIten(item.id);
-            setDeleteModalVisible(true);
-            setModalText("Tem certeza que quer deletar a resposta?");
-          }}
-        >
-          <Text style={styles.deleteButtonText}>Remover</Text>
-        </TouchableOpacity>
-      </View> */}
+
 
       {dataUser?.roles[0].authority !== "ADMIN" && (
         <View style={styles.cardFooter}>
