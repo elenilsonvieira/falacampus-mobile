@@ -75,4 +75,10 @@ Se quiser contribuir para o projeto, siga os passos:
 
 ---
 
-Desenvolvido por **Lívia Freitas** e **Marcelo Felipe** 🚀
+Desenvolvido por: 
+**Lívia Freitas**
+**Marcelo Felipe** 
+**Everaldo Daniel** 
+**Guilherme Moraes**
+**Jefferson Almir**  
+🚀
