@@ -29,7 +29,7 @@ export default function AuthContextProvider({ children }: ChildrenProps) {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/login",
+        "http://192.168.1.110:8080/api/login",
         values
       );
 
@@ -53,6 +53,8 @@ export default function AuthContextProvider({ children }: ChildrenProps) {
             pathname: "../(userTabs)/feed",
           });
         }
+      }else{
+        Alert.alert("Erro de login", "Verifique sua matrícula e senha.");
       }
     } catch (error) {
       Alert.alert("Erro de login", "Verifique sua matrícula e senha.");
