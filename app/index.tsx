@@ -1,11 +1,12 @@
+import { router } from 'expo-router';
 import React from 'react';
 import {
   StyleSheet,
   Text,
   View,
   Image,
-  TouchableOpacity,
-  ScrollView
+  ScrollView,
+  TouchableOpacity
 } from 'react-native';
 
 export default function App() {
@@ -15,10 +16,15 @@ export default function App() {
       
       {/* Cabeçalho: Logo Fala Campus à esquerda, Login à direita */}
       <View style={styles.header}>
-        <Image source={require('../../assets/images/Fala_campus-logo.png')} style={styles.logo} />
-        <TouchableOpacity style={styles.loginButton}>
-          <Text style={styles.loginText}>Login</Text>
-        </TouchableOpacity>
+         <Image source={require('../assets/images/Fala_campus-logo.png')} style={styles.logo} />
+
+         <TouchableOpacity
+            onPress={()=>router.push('/screens/login')}
+            style={styles.loginButton}
+          >
+            <Text style={styles.buttonText}>Login</Text>
+    
+          </TouchableOpacity>
       </View>
 
       {/* Texto introdutório em fundo claro */}
@@ -33,7 +39,7 @@ export default function App() {
       </View>
 
       {/* Imagem da mulher posicionada entre o texto introdutório e o contêiner verde */}
-      <Image source={require('../../assets/images/img-01.png')} style={styles.womanImage} resizeMode="contain" />
+      <Image source={require('../assets/images/img-01.png')} style={styles.womanImage} resizeMode="contain" />
 
       {/* Contêiner verde musgo com texto */}
       <View style={styles.darkGreenContainer}>
@@ -48,6 +54,9 @@ export default function App() {
           <Text style={styles.devsTitle}>Desenvolvedores:</Text>
           <Text style={styles.devsText}>• Marcelo Felipe da Silva</Text>
           <Text style={styles.devsText}>• Lívia Freitas de Lucena</Text>
+          <Text style={styles.devsText}>• Everaldo Daniel de Sousa Filho</Text>
+          <Text style={styles.devsText}>• Guilherme Moraes de Lira </Text>
+          <Text style={styles.devsText}>• Jefferson Almir Ramos da Silva </Text>
         </View>
       </View>
     </ScrollView>
@@ -80,17 +89,6 @@ const styles = StyleSheet.create({
   logo: {
     width: 120,
     height: 40,
-  },
-  loginButton: {
-    backgroundColor: '#8bc34a', // Verde menta
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 5,
-  },
-  loginText: {
-    fontSize: 16,
-    color: '#fff', // Texto branco
-    fontWeight: 'bold',
   },
 
   /* Área de introdução (fundo claro) */
@@ -156,5 +154,20 @@ const styles = StyleSheet.create({
     color: '#fff', // Texto branco
     fontSize: 16,
     marginBottom: 2,
+  },
+  loginButton: {
+     backgroundColor: '#4CAF50', 
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    
   },
 });

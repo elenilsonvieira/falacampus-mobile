@@ -6,13 +6,17 @@
 
 ## 🚀 Tecnologias Utilizadas  
 - **React Native** (com Expo)    
-- **AsyncStorage** (para armazenamento local)   
+- **AsyncStorage** (para armazenamento local)
+- **Backend** (com Java)
 
 ## 📌 Funcionalidades  
-✔️ Envio de críticas e sugestões de forma identificada  
+✔️ Envio de críticas, elogios e sugestões de forma identificada  
 ✔️ Categorização por departamentos (infraestrutura, professores, serviços, etc.)  
-✔️ Visualização de feedbacks enviados  
-✔️ Responder feedbacks enviados
+✔️ Visualização, edição e exclusão de comentários enviados  
+✔️ Responder comentários enviados  
+✔️ Visualização, edição e exclusão de respostas dos comentários  
+✔️ Autentificação com a conta do Suap  
+✔️ Pesquisa e filtragem de comentários  
 
 ## 📲 Como Executar o Projeto  
 
@@ -67,12 +71,18 @@ Se quiser contribuir para o projeto, siga os passos:
 5. **Abra um Pull Request no GitHub**  
 
 ## 🛠️ Melhorias Futuras  
-- 📌 Implementação de um painel do usuário 
-- 📌 Melhorias na interface e experiência do usuário  
-- 📌 Sistema de deletar e editar clicando no departamento
-- 📌 Integração com e-mails institucionais para resposta direta  
+- 📌 Melhorias na interface e experiência do usuário;  
+- 📌 Criação de área de notificação;
+- 📌 Adicionar nos departamento um campo para a escolha do responsável;
+- 📌 Lógica para definição de tempo para editar comentário e reposta.
 
 
 ---
 
-Desenvolvido por **Lívia Freitas** e **Marcelo Felipe** 🚀
+Desenvolvido por: 
+- **Lívia Freitas**
+- **Marcelo Felipe** 
+- **Everaldo Daniel** 
+- **Guilherme Moraes**
+- **Jefferson Almir**  
+🚀
