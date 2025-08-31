@@ -7,7 +7,7 @@
 ## 🚀 Tecnologias Utilizadas  
 - **React Native** (com Expo)    
 - **AsyncStorage** (para armazenamento local)
-- Backend (com Java)
+- **Backend** (com Java)
 
 ## 📌 Funcionalidades  
 ✔️ Envio de críticas, elogios e sugestões de forma identificada
