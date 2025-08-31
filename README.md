@@ -10,13 +10,13 @@
 - **Backend** (com Java)
 
 ## 📌 Funcionalidades  
-✔️ Envio de críticas, elogios e sugestões de forma identificada
-✔️ Categorização por departamentos (infraestrutura, professores, serviços, etc.)
-✔️ Visualização, edição e exclusão de comentários enviados
-✔️ Responder comentários enviados
-✔️ Visualização, edição e exclusão de respostas dos comentários
-✔️ Autentificação com a conta do Suap
-✔️ Pesquisa e filtragem de comentários
+✔️ Envio de críticas, elogios e sugestões de forma identificada  
+✔️ Categorização por departamentos (infraestrutura, professores, serviços, etc.)  
+✔️ Visualização, edição e exclusão de comentários enviados  
+✔️ Responder comentários enviados  
+✔️ Visualização, edição e exclusão de respostas dos comentários  
+✔️ Autentificação com a conta do Suap  
+✔️ Pesquisa e filtragem de comentários  
 
 ## 📲 Como Executar o Projeto  
 
