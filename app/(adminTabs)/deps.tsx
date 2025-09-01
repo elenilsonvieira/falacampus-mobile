@@ -26,24 +26,6 @@ const Departamentos = () => {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editName, setEditName] = useState("");
 
-  // Carrega os departamentos salvos
-  // const loadDepartments = async () => {
-  //   try {
-  //     const keys = await AsyncStorage.getAllKeys();
-  //     const departmentKeys = keys.filter((key) =>
-  //       key.startsWith("department_")
-  //     );
-  //     const departmentsData = await AsyncStorage.multiGet(departmentKeys);
-  //     const departmentsList = departmentsData.map(([key, value]) =>
-  //       JSON.parse(value!)
-  //     );
-
-  //     setDepartments(departmentsList);
-  //   } catch (error) {
-  //     console.log(error);
-  //     Alert.alert("Erro", "Ocorreu um erro ao carregar os departamentos.");
-  //   }
-  // };
   const loadDepartments = async () => {
     try {
       const response = await axios.get("http://localhost:8080/api/departament");
@@ -65,20 +47,7 @@ const Departamentos = () => {
     setModalVisible(true);
   };
 
-  // Deleta o departamento
-  // const handleDelete = async () => {
-  //   if (!selectedDepartment) return;
-
-  //   try {
-  //     await AsyncStorage.removeItem(`department_${selectedDepartment.id}`);
-  //     setModalVisible(false);
-  //     loadDepartments();
-  //     Alert.alert("Sucesso", "Departamento deletado com sucesso!");
-  //   } catch (error) {
-  //     console.log(error);
-  //     Alert.alert("Erro", "Ocorreu um erro ao deletar o departamento.");
-  //   }
-  // };
+  
   const handleDelete = async () => {
     if (!selectedDepartment) return;
 
