@@ -51,8 +51,8 @@ Certifique-se de ter instalado:
 
 ## 📷 Explicações em Vídeo do Código
 
-| [Link do youtube sobre a explicação do código](https://youtu.be/9b-dr0dOA60) |
-| [Link do youtube sobre a explicação do código](https://youtu.be/WP3qkus_hhI) |  equipe 2
+- | [Link do youtube sobre a explicação do código](https://youtu.be/9b-dr0dOA60) |
+- | [Link do youtube sobre a explicação do código](https://youtu.be/WP3qkus_hhI) |  equipe 2
 
 ## 🤝 Contribuição  
 Se quiser contribuir para o projeto, siga os passos:  
