@@ -6,13 +6,17 @@
 
 ## 🚀 Tecnologias Utilizadas  
 - **React Native** (com Expo)    
-- **AsyncStorage** (para armazenamento local)   
+- **AsyncStorage** (para armazenamento local)
+- **Backend** (com Java)
 
 ## 📌 Funcionalidades  
-✔️ Envio de críticas e sugestões de forma identificada  
+✔️ Envio de críticas, elogios e sugestões de forma identificada  
 ✔️ Categorização por departamentos (infraestrutura, professores, serviços, etc.)  
-✔️ Visualização de feedbacks enviados  
-✔️ Responder feedbacks enviados
+✔️ Visualização, edição e exclusão de comentários enviados  
+✔️ Responder comentários enviados  
+✔️ Visualização, edição e exclusão de respostas dos comentários  
+✔️ Autentificação com a conta do Suap  
+✔️ Pesquisa e filtragem de comentários  
 
 ## 📲 Como Executar o Projeto  
 
